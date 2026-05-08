@@ -1,0 +1,16 @@
+{
+  "name": "OT Drug Chart",
+  "short_name": "Drug Chart",
+  "description": "OT Department Drug Chart Management",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f3d2e",
+  "theme_color": "#0f3d2e",
+  "orientation": "portrait-primary",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ],
+  "categories": ["medical", "productivity"],
+  "lang": "en-GB"
+}
