@@ -152,16 +152,15 @@ function sendAlertEmail(drug, stock, threshold) {
   MailApp.sendEmail(ALERT_EMAIL, subject, body);
 }
 
-// ── WEEKLY STOCK SUMMARY ────────────────────────────────────────
-// Can be triggered two ways:
-//   1. Automatically: set a trigger → sendWeeklySummary → Week timer → Monday → 7am
-//   2. On demand: tap "Send summary now" in the app (calls handleSendSummary)
-
-function buildSummaryBody_() {
+// ── ON-DEMAND STOCK SUMMARY ─────────────────────────────────────
+// Triggered when staff tap "Send summary now" in the app.
+// Sends current stock levels to the email address provided.
+function handleSendSummary(data) {
   const ss    = SpreadsheetApp.getActiveSpreadsheet();
   const sheet = ss.getSheetByName(SHEET_NAME_STOCK);
   const vals  = sheet.getDataRange().getValues().slice(1);
-  if (!vals.length) return null;
+  if (!vals.length) return;
+
   const rows = vals.map(r => {
     const name  = r[0] || "";
     const stock = Number(r[1]) || 0;
@@ -169,29 +168,13 @@ function buildSummaryBody_() {
     const flag  = stock === 0 ? " OUT" : stock <= thr ? " LOW" : " OK";
     return "  " + name.padEnd(28) + "Stock: " + stock + flag;
   }).join("\n");
-  return rows;
-}
 
-// Called by the weekly time-driven trigger
-function sendWeeklySummary() {
-  const rows = buildSummaryBody_();
-  if (!rows) return;
-  const subject = "[OT Drug Chart] Weekly Stock Summary - " + new Date().toLocaleDateString();
-  const body    = "Weekly Drug Stock Summary - OT Department\n" +
-                  "─────────────────────────────────────────\n" +
-                  rows + "\n\n- OT Drug Chart System - " + new Date().toLocaleString();
-  MailApp.sendEmail(ALERT_EMAIL, subject, body);
-}
-
-// Called when staff tap "Send summary now" in the app
-function handleSendSummary(data) {
   const toEmail = data.email || ALERT_EMAIL;
-  const rows    = buildSummaryBody_();
-  if (!rows) return;
-  const subject = "[OT Drug Chart] Stock Summary - " + new Date().toLocaleDateString();
-  const body    = "Drug Stock Summary - OT Department\n" +
+  const subject = "[OT Drug Chart] Current Stock Summary - " + new Date().toLocaleDateString();
+  const body    = "Current Drug Stock Summary - OT Department\n" +
                   "─────────────────────────────────────────\n" +
                   rows + "\n\n- OT Drug Chart System - " + new Date().toLocaleString();
+
   MailApp.sendEmail(toEmail, subject, body);
 }
 
