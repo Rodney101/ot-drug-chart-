@@ -1,4 +1,6 @@
-const CACHE = 'ot-drug-chart-v3';
+const CACHE_NAME = 'ot-drug-chart-v3';
+
+// Use relative paths so the SW works in any subdirectory (including GitHub Pages)
 const ASSETS = [
   './',
   './index.html',
@@ -7,65 +9,43 @@ const ASSETS = [
   './icons/icon-512.png'
 ];
 
-// Install — pre-cache all assets
 self.addEventListener('install', e => {
+  self.skipWaiting();
   e.waitUntil(
-    caches.open(CACHE)
-      .then(c => c.addAll(ASSETS))
-      .then(() => self.skipWaiting())
+    caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS))
   );
 });
 
-// Activate — remove old caches immediately
 self.addEventListener('activate', e => {
   e.waitUntil(
     caches.keys()
-      .then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k))))
+      .then(keys => Promise.all(
+        keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))
+      ))
       .then(() => self.clients.claim())
   );
 });
 
-// Fetch — cache-first for app assets, network-first for API calls
 self.addEventListener('fetch', e => {
-  const url = new URL(e.request.url);
-
-  // Always go to network for Google Sheets API calls
-  if (url.hostname.includes('script.google.com')) return;
+  // Never intercept Google Sheets API calls
+  if (e.request.url.includes('script.google.com')) return;
+  // Never intercept Google Fonts
+  if (e.request.url.includes('fonts.googleapis.com') || e.request.url.includes('fonts.gstatic.com')) return;
 
   e.respondWith(
     caches.match(e.request).then(cached => {
       if (cached) return cached;
-      return fetch(e.request).then(res => {
-        if (res && res.status === 200 && res.type === 'basic') {
-          const clone = res.clone();
-          caches.open(CACHE).then(c => c.put(e.request, clone));
+      return fetch(e.request).then(response => {
+        // Cache valid same-origin responses
+        if (response && response.status === 200 && response.type === 'basic') {
+          const responseClone = response.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(e.request, responseClone));
         }
-        return res;
-      }).catch(() => caches.match('./index.html'));
-    })
-  );
-});
-
-// Push notifications
-self.addEventListener('push', e => {
-  const d = e.data ? e.data.json() : { title: 'OT Drug Chart', body: 'Alert' };
-  e.waitUntil(
-    self.registration.showNotification(d.title || 'OT Drug Chart', {
-      body: d.body || '',
-      icon: './icons/icon-192.png',
-      badge: './icons/icon-192.png',
-      tag: 'ot-alert',
-      requireInteraction: true
-    })
-  );
-});
-
-self.addEventListener('notificationclick', e => {
-  e.notification.close();
-  e.waitUntil(
-    clients.matchAll({ type: 'window' }).then(list => {
-      for (const c of list) { if ('focus' in c) return c.focus(); }
-      return clients.openWindow('./');
+        return response;
+      }).catch(() => {
+        // Offline fallback — return the app shell
+        if (e.request.mode === 'navigate') return caches.match('./index.html');
+      });
     })
   );
 });

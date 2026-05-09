@@ -7,10 +7,10 @@
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="apple-mobile-web-app-title" content="OT Drugs"/>
-<link rel="manifest" href="./manifest.json"/>
-<link rel="apple-touch-icon" href="./icons/icon-192.png"/>
-<meta name="apple-mobile-web-app-title" content="OT Drugs"/>
 <meta name="mobile-web-app-capable" content="yes"/>
+<link rel="manifest" href="./manifest.json"/>
+<link rel="apple-touch-icon" sizes="192x192" href="./icons/icon-192.png"/>
+<link rel="apple-touch-icon" sizes="512x512" href="./icons/icon-512.png"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
@@ -865,7 +865,12 @@ function saveEmail() {
 
 // ── SERVICE WORKER ──────────────────────────────────────────────
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js').catch(e=>console.warn('SW:',e));
+  // Use the page's current path as the scope so it works on both
+  // GitHub Pages (subdirectory) and a root domain deployment
+  const swScope = window.location.pathname.replace(/\/[^\/]*$/, '/') || '/';
+  navigator.serviceWorker.register('./sw.js', { scope: swScope })
+    .then(reg => console.log('SW registered, scope:', reg.scope))
+    .catch(e => console.warn('SW failed:', e));
 }
 
 // ── INIT ──────────────────────────────────────
