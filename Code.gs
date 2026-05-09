@@ -27,15 +27,13 @@ function doGet(e) {
     const nameIdx  = headers.indexOf("drug");
     const stockIdx = headers.indexOf("stock");
     const thrIdx   = headers.indexOf("threshold");
-    const maxIdx   = headers.indexOf("max");
 
     const rows = vals.slice(1)
       .filter(r => r[nameIdx])
       .map(r => ({
         name:      r[nameIdx].toString(),
         stock:     Number(r[stockIdx]) || 0,
-        threshold: Number(r[thrIdx])   || 5,
-        max:       Number(r[maxIdx])   || 30
+        threshold: Number(r[thrIdx])   || 5
       }));
 
     return jsonResponse(rows);
@@ -88,10 +86,9 @@ function handleStock(data) {
   let found = false;
   for (let i = 1; i < vals.length; i++) {
     if (vals[i][0].toString().toLowerCase() === data.drug.toString().toLowerCase()) {
-      sheet.getRange(i + 1, 2, 1, 3).setValues([[
+      sheet.getRange(i + 1, 2, 1, 2).setValues([[
         Number(data.stock),
-        Number(data.threshold),
-        Number(data.max)
+        Number(data.threshold)
       ]]);
       found = true;
       break;
@@ -99,7 +96,7 @@ function handleStock(data) {
   }
 
   if (!found) {
-    sheet.appendRow([data.drug, Number(data.stock), Number(data.threshold), Number(data.max)]);
+    sheet.appendRow([data.drug, Number(data.stock), Number(data.threshold)]);
   }
 }
 
@@ -161,5 +158,5 @@ function jsonResponse(data) {
 //    Timestamp | Drug | Qty Used | Notes | Stock After | Threshold
 //
 //  "Stock" tab row 1:
-//    Drug | Stock | Threshold | Max
+//    Drug | Stock | Threshold
 // ═══════════════════════════════════════════════════════════════

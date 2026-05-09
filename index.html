@@ -126,8 +126,6 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
 .di-info { flex: 1; min-width: 0; }
 .di-name { font-family: var(--font-head); font-size: 14px; font-weight: 600; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .di-meta { font-size: 12px; color: var(--muted); margin-top: 2px; }
-.bar-wrap { width: 52px; height: 4px; background: var(--border); border-radius: 99px; overflow: hidden; flex-shrink: 0; }
-.bar-fill { height: 100%; border-radius: 99px; transition: width 0.4s; }
 .del-btn { width: 28px; height: 28px; border-radius: 50%; border: none; background: var(--surface); cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 13px; flex-shrink: 0; }
 
 /* LOG ROWS */
@@ -316,10 +314,6 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
         <div><label>Current stock</label><input type="number" id="drug-stock" min="0" placeholder="e.g. 20"/></div>
         <div><label>Reorder at</label><input type="number" id="drug-thresh" min="1" placeholder="e.g. 5"/></div>
       </div>
-      <div class="fg">
-        <label>Max stock <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--muted);font-size:10px;">(prevents over-ordering)</span></label>
-        <input type="number" id="drug-max" min="1" placeholder="e.g. 30"/>
-      </div>
       <div style="display:flex;gap:8px;">
         <button class="btn btn-primary" onclick="addDrug()" style="flex:2;">Save drug</button>
         <button class="btn btn-ghost" onclick="hideAddForm()" style="flex:1;">Cancel</button>
@@ -418,10 +412,10 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
 <script>
 // ── STATE ──────────────────────────────────────────────
 let drugs    = JSON.parse(localStorage.getItem('ot_drugs')    || 'null') || [
-  { name:'Paracetamol 500mg', stock:18, threshold:5,  max:30 },
-  { name:'Ibuprofen 400mg',   stock:4,  threshold:5,  max:25 },
-  { name:'Morphine 10mg/ml',  stock:2,  threshold:4,  max:10 },
-  { name:'Metoclopramide',    stock:12, threshold:4,  max:20 },
+  { name:'Paracetamol 500mg', stock:18, threshold:5 },
+  { name:'Ibuprofen 400mg',   stock:4,  threshold:5 },
+  { name:'Morphine 10mg/ml',  stock:2,  threshold:4 },
+  { name:'Metoclopramide',    stock:12, threshold:4 },
 ];
 let logs     = JSON.parse(localStorage.getItem('ot_logs')     || '[]');
 let settings = JSON.parse(localStorage.getItem('ot_settings') || '{}');
@@ -515,16 +509,14 @@ function render() {
   dl.innerHTML = !drugs.length
     ? '<div class="empty"><svg viewBox="0 0 24 24"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>No drugs added</div>'
     : drugs.map((d,i)=>{
-      const pct = Math.min(100, Math.round(d.stock/d.max*100));
       const s   = status(d);
       const col = s==='ok'?'#00b894':s==='low'?'#f59e0b':'#ef4444';
       const bdg = s==='ok'?'<span class="badge b-ok">OK</span>':s==='low'?'<span class="badge b-warn">LOW</span>':'<span class="badge b-bad">OUT</span>';
       return `<div class="drug-item">
         <div class="di-info">
           <div class="di-name">${d.name}</div>
-          <div class="di-meta">${d.stock} / ${d.max} · reorder at ${d.threshold}</div>
+          <div class="di-meta">${d.stock} units · reorder at ${d.threshold}</div>
         </div>
-        <div class="bar-wrap"><div class="bar-fill" style="width:${pct}%;background:${col};"></div></div>
         ${bdg}
         <button class="del-btn" onclick="removeDrug(${i})">✕</button>
       </div>`;
@@ -584,7 +576,7 @@ function logUsage() {
   }
   if (settings.sheetUrl && document.getElementById('tog-push-log').checked) {
     sendToSheets({ type:'log', drug, qty, notes, stock: d.stock, threshold: d.threshold, ts: entry.ts });
-    sendToSheets({ type:'stock', drug, stock: d.stock, threshold: d.threshold, max: d.max });
+    sendToSheets({ type:'stock', drug, stock: d.stock, threshold: d.threshold });
   }
 }
 
@@ -593,15 +585,14 @@ function addDrug() {
   const name  = document.getElementById('drug-name').value.trim();
   const stock = parseInt(document.getElementById('drug-stock').value);
   const thr   = parseInt(document.getElementById('drug-thresh').value);
-  const max   = parseInt(document.getElementById('drug-max').value);
-  if (!name||isNaN(stock)||isNaN(thr)||isNaN(max)) { toast('Fill in all fields'); return; }
+  if (!name||isNaN(stock)||isNaN(thr)) { toast('Fill in all fields'); return; }
   const idx = drugs.findIndex(d=>d.name.toLowerCase()===name.toLowerCase());
-  if (idx>=0) drugs[idx]={name,stock,threshold:thr,max};
-  else drugs.push({name,stock,threshold:thr,max});
-  ['drug-name','drug-stock','drug-thresh','drug-max'].forEach(id=>document.getElementById(id).value='');
+  if (idx>=0) drugs[idx]={name,stock,threshold:thr};
+  else drugs.push({name,stock,threshold:thr});
+  ['drug-name','drug-stock','drug-thresh'].forEach(id=>document.getElementById(id).value='');
   hideAddForm();
   persist(); render(); toast('Drug saved ✓');
-  if (settings.sheetUrl) sendToSheets({type:'stock',drug:name,stock,threshold:thr,max});
+  if (settings.sheetUrl) sendToSheets({type:'stock',drug:name,stock,threshold:thr});
 }
 
 function removeDrug(i) {
@@ -639,8 +630,7 @@ async function syncFromSheets() {
         const updated = {
           name: row.name,
           stock: parseInt(row.stock)||0,
-          threshold: parseInt(row.threshold)||5,
-          max: parseInt(row.max)||30
+          threshold: parseInt(row.threshold)||5
         };
         if (idx>=0) drugs[idx]=updated;
         else drugs.push(updated);
