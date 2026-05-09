@@ -610,7 +610,7 @@ function logUsage() {
     if (settings.pushEnabled) push(`Low stock: ${d.name}`, `${d.stock} unit${d.stock!==1?'s':''} remaining — reorder needed.`);
   }
   if (settings.sheetUrl && document.getElementById('tog-push-log').checked) {
-    sendToSheets({ type:'log', drug, qty, notes, stock: d.stock, threshold: d.threshold, ts: entry.ts });
+    sendToSheets({ type:'activity', event: 'Drug Used', drug, qty, notes, stock: d.stock, threshold: d.threshold, ts: entry.ts });
     sendToSheets({ type:'stock', drug, stock: d.stock, threshold: d.threshold });
   }
 }
@@ -711,9 +711,15 @@ function addDrug() {
   else drugs.push({name,stock,threshold:thr});
   ['drug-name','drug-stock','drug-thresh'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('ac-list').classList.remove('open');
+  const _verb = idx >= 0 ? 'Stock Updated' : 'Drug Added';
+  const _ts   = new Date().toISOString();
+  activity.push({ kind:'stock', drug: name, stock, threshold: thr, verb: _verb, ts: _ts });
   hideAddForm();
   persist(); render(); toast('Drug saved ✓');
-  if (settings.sheetUrl) sendToSheets({type:'stock',drug:name,stock,threshold:thr});
+  if (settings.sheetUrl) {
+    sendToSheets({ type:'activity', event: _verb, drug: name, stock, threshold: thr, ts: _ts });
+    sendToSheets({ type:'stock', drug: name, stock, threshold: thr });
+  }
 }
 
 let _editIdx = -1;
@@ -743,7 +749,10 @@ function saveEditDrug() {
   persist();
   render();
   toast('Drug renamed ✓');
-  if (settings.sheetUrl) sendToSheets({ type:'rename', oldName, newName, stock, threshold });
+  if (settings.sheetUrl) {
+    sendToSheets({ type:'activity', event: 'Drug Renamed', drug: newName, oldName, stock, threshold, ts: new Date().toISOString() });
+    sendToSheets({ type:'rename', oldName, newName, stock, threshold });
+  }
 }
 function closeEditModal() {
   document.getElementById('edit-backdrop').style.display = 'none';
