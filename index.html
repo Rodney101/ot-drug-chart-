@@ -386,15 +386,14 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
     <div class="s-label">Notifications</div>
     <div class="card">
       <div class="fg">
-        <label>Alert email</label>
+        <label>Summary email</label>
         <input type="email" id="cfg-email" placeholder="ot-lead@hospital.com"/>
+        <p style="font-size:11px;color:var(--muted);margin-top:5px;line-height:1.6;">Weekly stock summary will be sent to this address.</p>
       </div>
-
-
-      <div class="s-row" style="border:none;">
-        <div><div class="s-info-label">Weekly summary email</div><div class="s-info-sub">Monday morning stock report (set trigger in Apps Script)</div></div>
-        <label class="toggle"><input type="checkbox" id="tog-daily" checked/><span class="tslider"></span></label>
-      </div>
+      <button class="btn btn-dark" onclick="sendSummaryNow()" id="send-summary-btn" style="margin-bottom:10px;">
+        <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2L15 22l-4-9-9-4 20-7z"/></svg>
+        Send summary now
+      </button>
       <button class="btn btn-primary" onclick="saveSettings()">
         <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
         Save settings
@@ -847,6 +846,19 @@ function testPush() {
 }
 
 // ── SETTINGS ──────────────────────────────────────────────
+function sendSummaryNow() {
+  const email = document.getElementById('cfg-email').value.trim();
+  if (!email) { toast('Enter a summary email address first'); return; }
+  if (!settings.sheetUrl) { toast('No Sheets URL — check connection settings'); return; }
+  const btn = document.getElementById('send-summary-btn');
+  btn.textContent = 'Sending…';
+  btn.disabled = true;
+  sendToSheets({ type:'sendSummary', email })
+    .then(() => { toast('Summary sent to ' + email + ' ✓'); })
+    .catch(() => { toast('Failed to send — check Sheets connection'); })
+    .finally(() => { btn.innerHTML = '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2L15 22l-4-9-9-4 20-7z"/></svg> Send summary now'; btn.disabled = false; });
+}
+
 function saveUrl() {
   settings.sheetUrl = document.getElementById('cfg-url').value.trim();
   persist(); render(); toast('Sheet URL saved ✓');

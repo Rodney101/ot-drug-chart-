@@ -49,10 +49,11 @@ function doPost(e) {
   try {
     const data = JSON.parse(e.postData.contents);
 
-    if (data.type === "activity") handleActivity(data);
-    if (data.type === "stock")    handleStock(data);
-    if (data.type === "rename")   handleRename(data);
-    if (data.type === "delete")   handleDelete(data);
+    if (data.type === "activity")    handleActivity(data);
+    if (data.type === "stock")       handleStock(data);
+    if (data.type === "rename")      handleRename(data);
+    if (data.type === "delete")      handleDelete(data);
+    if (data.type === "sendSummary") handleSendSummary(data);
 
     return jsonResponse({ status: "ok" });
   } catch (err) {
@@ -151,16 +152,16 @@ function sendAlertEmail(drug, stock, threshold) {
   MailApp.sendEmail(ALERT_EMAIL, subject, body);
 }
 
-// ── WEEKLY MONDAY MORNING STOCK SUMMARY ─────────────────────────
-// Set trigger: Extensions → Triggers → sendWeeklySummary → Time-driven
-//   → Week timer → Every Monday → 7am–8am
-function sendWeeklySummary() {
+// ── WEEKLY STOCK SUMMARY ────────────────────────────────────────
+// Can be triggered two ways:
+//   1. Automatically: set a trigger → sendWeeklySummary → Week timer → Monday → 7am
+//   2. On demand: tap "Send summary now" in the app (calls handleSendSummary)
+
+function buildSummaryBody_() {
   const ss    = SpreadsheetApp.getActiveSpreadsheet();
   const sheet = ss.getSheetByName(SHEET_NAME_STOCK);
   const vals  = sheet.getDataRange().getValues().slice(1);
-
-  if (!vals.length) return;
-
+  if (!vals.length) return null;
   const rows = vals.map(r => {
     const name  = r[0] || "";
     const stock = Number(r[1]) || 0;
@@ -168,14 +169,30 @@ function sendWeeklySummary() {
     const flag  = stock === 0 ? " OUT" : stock <= thr ? " LOW" : " OK";
     return "  " + name.padEnd(28) + "Stock: " + stock + flag;
   }).join("\n");
+  return rows;
+}
 
+// Called by the weekly time-driven trigger
+function sendWeeklySummary() {
+  const rows = buildSummaryBody_();
+  if (!rows) return;
   const subject = "[OT Drug Chart] Weekly Stock Summary - " + new Date().toLocaleDateString();
-  const body    =
-    "Weekly Drug Stock Summary - OT Department\n" +
-    "─────────────────────────────────────────\n" +
-    rows + "\n\n- OT Drug Chart System - " + new Date().toLocaleString();
-
+  const body    = "Weekly Drug Stock Summary - OT Department\n" +
+                  "─────────────────────────────────────────\n" +
+                  rows + "\n\n- OT Drug Chart System - " + new Date().toLocaleString();
   MailApp.sendEmail(ALERT_EMAIL, subject, body);
+}
+
+// Called when staff tap "Send summary now" in the app
+function handleSendSummary(data) {
+  const toEmail = data.email || ALERT_EMAIL;
+  const rows    = buildSummaryBody_();
+  if (!rows) return;
+  const subject = "[OT Drug Chart] Stock Summary - " + new Date().toLocaleDateString();
+  const body    = "Drug Stock Summary - OT Department\n" +
+                  "─────────────────────────────────────────\n" +
+                  rows + "\n\n- OT Drug Chart System - " + new Date().toLocaleString();
+  MailApp.sendEmail(toEmail, subject, body);
 }
 
 // ── HELPER ───────────────────────────────────────────────────────
