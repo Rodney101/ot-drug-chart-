@@ -151,9 +151,10 @@ function sendAlertEmail(drug, stock, threshold) {
   MailApp.sendEmail(ALERT_EMAIL, subject, body);
 }
 
-// ── DAILY MORNING STOCK SUMMARY ──────────────────────────────────
-// Set trigger: Extensions → Triggers → sendDailySummary → Time-driven → Day timer → 7am
-function sendDailySummary() {
+// ── WEEKLY MONDAY MORNING STOCK SUMMARY ─────────────────────────
+// Set trigger: Extensions → Triggers → sendWeeklySummary → Time-driven
+//   → Week timer → Every Monday → 7am–8am
+function sendWeeklySummary() {
   const ss    = SpreadsheetApp.getActiveSpreadsheet();
   const sheet = ss.getSheetByName(SHEET_NAME_STOCK);
   const vals  = sheet.getDataRange().getValues().slice(1);
@@ -168,9 +169,10 @@ function sendDailySummary() {
     return "  " + name.padEnd(28) + "Stock: " + stock + flag;
   }).join("\n");
 
-  const subject = "[OT Drug Chart] Daily Stock Summary - " + new Date().toLocaleDateString();
+  const subject = "[OT Drug Chart] Weekly Stock Summary - " + new Date().toLocaleDateString();
   const body    =
-    "Daily Drug Stock Summary - OT Department\n" +
+    "Weekly Drug Stock Summary - OT Department\n" +
+    "─────────────────────────────────────────\n" +
     rows + "\n\n- OT Drug Chart System - " + new Date().toLocaleString();
 
   MailApp.sendEmail(ALERT_EMAIL, subject, body);

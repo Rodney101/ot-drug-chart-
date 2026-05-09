@@ -392,7 +392,7 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
 
 
       <div class="s-row" style="border:none;">
-        <div><div class="s-info-label">Daily summary email</div><div class="s-info-sub">Morning stock report (set trigger in Apps Script)</div></div>
+        <div><div class="s-info-label">Weekly summary email</div><div class="s-info-sub">Monday morning stock report (set trigger in Apps Script)</div></div>
         <label class="toggle"><input type="checkbox" id="tog-daily" checked/><span class="tslider"></span></label>
       </div>
       <button class="btn btn-primary" onclick="saveSettings()">
@@ -496,7 +496,7 @@ function render() {
     sd.className='sync-dot'; st.textContent='Not connected to Sheets'; snb.style.display='none';
   } else {
     sd.className='sync-dot ok';
-    st.textContent = lastSync ? 'Synced '+new Date(lastSync).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}) : 'Connected · not synced yet';
+    st.textContent = lastSync ? 'Synced '+new Date(lastSync).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:true}) : 'Connected · not synced yet';
     snb.style.display='block';
   }
 
@@ -546,7 +546,7 @@ function render() {
 
   // Last synced label
   const lsl = document.getElementById('last-synced-lbl');
-  lsl.textContent = lastSync ? 'Synced '+new Date(lastSync).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}) : '';
+  lsl.textContent = lastSync ? 'Synced '+new Date(lastSync).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:true}) : '';
 
   // Alert list
   const al = document.getElementById('alert-list');
@@ -563,7 +563,7 @@ function render() {
 
   // Dashboard sync card
   const dsc = document.getElementById('dash-sync-sub');
-  dsc.textContent = settings.sheetUrl ? (lastSync ? 'Last synced '+new Date(lastSync).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}) : 'Connected — tap to sync') : 'Connect in Settings to enable auto-sync';
+  dsc.textContent = settings.sheetUrl ? (lastSync ? 'Last synced '+new Date(lastSync).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:true}) : 'Connected — tap to sync') : 'Connect in Settings to enable auto-sync';
   document.querySelector('#dash-sync-card .sc-btn').textContent = settings.sheetUrl ? 'Sync now →' : 'Set up →';
   document.querySelector('#dash-sync-card .sc-btn').onclick = settings.sheetUrl ? syncFromSheets : ()=>go('settings');
 
