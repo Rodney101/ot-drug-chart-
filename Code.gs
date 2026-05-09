@@ -52,6 +52,7 @@ function doPost(e) {
     if (data.type === "activity") handleActivity(data);
     if (data.type === "stock")    handleStock(data);
     if (data.type === "rename")   handleRename(data);
+    if (data.type === "delete")   handleDelete(data);
 
     return jsonResponse({ status: "ok" });
   } catch (err) {
@@ -116,6 +117,20 @@ function handleRename(data) {
 
   // Old name not in sheet — add as new row
   sheet.appendRow([data.newName, Number(data.stock), Number(data.threshold)]);
+}
+
+// ── DELETE DRUG FROM STOCK TAB ──────────────────────────────────
+function handleDelete(data) {
+  const ss    = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName(SHEET_NAME_STOCK);
+  const vals  = sheet.getDataRange().getValues();
+
+  for (let i = 1; i < vals.length; i++) {
+    if (vals[i][0].toString().toLowerCase() === data.drug.toString().toLowerCase()) {
+      sheet.deleteRow(i + 1);
+      return;
+    }
+  }
 }
 
 // ── SEND ALERT EMAIL ─────────────────────────────────────────────

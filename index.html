@@ -760,8 +760,21 @@ function closeEditModal() {
   _editIdx = -1;
 }
 function removeDrug(i) {
-  if (!confirm('Remove '+drugs[i].name+'?')) return;
-  drugs.splice(i,1); persist(); render();
+  const drug      = drugs[i].name;
+  const stock     = drugs[i].stock;
+  const threshold = drugs[i].threshold;
+  if (!confirm('Remove ' + drug + ' from stock?')) return;
+  const ts = new Date().toISOString();
+  activity.push({ kind:'stock', drug, stock, threshold, verb: 'Removed', ts });
+  drugs.splice(i, 1);
+  persist(); render();
+  toast(drug + ' removed ✓');
+  if (settings.sheetUrl) {
+    // Log the removal in the Logs tab
+    sendToSheets({ type:'activity', event: 'Drug Removed', drug, stock, threshold, ts });
+    // Delete the row from the Stock tab
+    sendToSheets({ type:'delete', drug });
+  }
 }
 
 // ── GOOGLE SHEETS — PUSH ──────────────────────────────────────────────
