@@ -428,7 +428,7 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
 
 <!-- EDIT DRUG NAME MODAL -->
 <div class="modal-overlay" id="edit-modal" onclick="closeEditModal(event)">
-  <div class="modal">
+  <div class="modal" onclick="event.stopPropagation()">
     <div class="modal-title">Edit drug name</div>
     <div class="fg" style="margin-bottom:0;"><label>New name</label><input type="text" id="edit-drug-name" placeholder="Enter new drug name" autocomplete="off" onkeydown="if(event.key==='Enter')saveEditDrug()"/></div>
     <div class="modal-btns">
@@ -672,13 +672,21 @@ function saveEditDrug() {
   const newName = document.getElementById('edit-drug-name').value.trim();
   if (!newName) { toast('Enter a drug name'); return; }
   if (_editIdx < 0 || _editIdx >= drugs.length) return;
-  const oldName = drugs[_editIdx].name;
+  // Capture all values BEFORE any DOM changes
+  const oldName   = drugs[_editIdx].name;
+  const stock     = drugs[_editIdx].stock;
+  const threshold = drugs[_editIdx].threshold;
+  // Update data
   drugs[_editIdx].name = newName;
-  activity.push({ kind:'stock', drug: newName, stock: drugs[_editIdx].stock, threshold: drugs[_editIdx].threshold, verb: 'Renamed', ts: new Date().toISOString() });
-  persist(); render();
+  activity.push({ kind:'stock', drug: newName, stock, threshold, verb: 'Renamed', ts: new Date().toISOString() });
+  // Close modal FIRST, then persist/render so modal overlay click handler
+  // doesn't interfere with the save
   document.getElementById('edit-modal').classList.remove('open');
+  _editIdx = -1;
+  persist();
+  render();
   toast('Drug renamed ✓');
-  if (settings.sheetUrl) sendToSheets({ type:'rename', oldName, newName, stock: drugs[_editIdx].stock, threshold: drugs[_editIdx].threshold });
+  if (settings.sheetUrl) sendToSheets({ type:'rename', oldName, newName, stock, threshold });
 }
 function closeEditModal(e) {
   if (e.target === document.getElementById('edit-modal')) document.getElementById('edit-modal').classList.remove('open');
