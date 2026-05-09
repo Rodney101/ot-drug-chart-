@@ -672,12 +672,13 @@ function saveEditDrug() {
   const newName = document.getElementById('edit-drug-name').value.trim();
   if (!newName) { toast('Enter a drug name'); return; }
   if (_editIdx < 0 || _editIdx >= drugs.length) return;
+  const oldName = drugs[_editIdx].name;
   drugs[_editIdx].name = newName;
   activity.push({ kind:'stock', drug: newName, stock: drugs[_editIdx].stock, threshold: drugs[_editIdx].threshold, verb: 'Renamed', ts: new Date().toISOString() });
   persist(); render();
   document.getElementById('edit-modal').classList.remove('open');
   toast('Drug renamed ✓');
-  if (settings.sheetUrl) sendToSheets({ type:'stock', drug: newName, stock: drugs[_editIdx].stock, threshold: drugs[_editIdx].threshold });
+  if (settings.sheetUrl) sendToSheets({ type:'rename', oldName, newName, stock: drugs[_editIdx].stock, threshold: drugs[_editIdx].threshold });
 }
 function closeEditModal(e) {
   if (e.target === document.getElementById('edit-modal')) document.getElementById('edit-modal').classList.remove('open');

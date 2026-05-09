@@ -48,8 +48,9 @@ function doPost(e) {
   try {
     const data = JSON.parse(e.postData.contents);
 
-    if (data.type === "log")   handleLog(data);
-    if (data.type === "stock") handleStock(data);
+    if (data.type === "log")    handleLog(data);
+    if (data.type === "stock")  handleStock(data);
+    if (data.type === "rename") handleRename(data);
 
     return jsonResponse({ status: "ok" });
   } catch (err) {
@@ -98,6 +99,30 @@ function handleStock(data) {
   if (!found) {
     sheet.appendRow([data.drug, Number(data.stock), Number(data.threshold)]);
   }
+}
+
+// ── RENAME DRUG IN STOCK TAB ────────────────────────────────────
+// Finds the old drug name in the Stock tab and updates it to the new name
+// in place — preserving the row position rather than creating a duplicate.
+function handleRename(data) {
+  const ss    = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName(SHEET_NAME_STOCK);
+  const vals  = sheet.getDataRange().getValues();
+
+  for (let i = 1; i < vals.length; i++) {
+    if (vals[i][0].toString().toLowerCase() === data.oldName.toString().toLowerCase()) {
+      // Update name, stock, and threshold in the existing row
+      sheet.getRange(i + 1, 1, 1, 3).setValues([[
+        data.newName,
+        Number(data.stock),
+        Number(data.threshold)
+      ]]);
+      return;
+    }
+  }
+
+  // Old name not found — create a new row with the new name
+  sheet.appendRow([data.newName, Number(data.stock), Number(data.threshold)]);
 }
 
 // ── SEND ALERT EMAIL ─────────────────────────────────────────────
