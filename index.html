@@ -616,42 +616,89 @@ function logUsage() {
 }
 
 // ── AUTOCOMPLETE ──────────────────────────────────────────────
+// FIX: mousedown+touchstart preventDefault on the LIST CONTAINER stops the
+// input blur firing before the tap resolves — the root cause of selections
+// being swallowed. Items use data-name + delegated click, no inline handlers.
 let acIdx = -1;
+
+(function() {
+  var list = document.getElementById('ac-list');
+
+  list.addEventListener('mousedown',  function(e) { e.preventDefault(); });
+  list.addEventListener('touchstart', function(e) { e.preventDefault(); }, { passive: false });
+
+  list.addEventListener('click', function(e) {
+    var item = e.target.closest('.ac-item');
+    if (!item) return;
+    var name = item.getAttribute('data-name');
+    if (name === '__new__') {
+      document.getElementById('drug-stock').value  = '';
+      document.getElementById('drug-thresh').value = '';
+    } else {
+      document.getElementById('drug-name').value = name;
+      var d = drugs.find(function(x) { return x.name === name; });
+      if (d) {
+        document.getElementById('drug-stock').value  = d.stock;
+        document.getElementById('drug-thresh').value = d.threshold;
+      }
+    }
+    list.classList.remove('open');
+  });
+})();
+
 function acUpdate() {
-  const val = document.getElementById("drug-name").value.trim().toLowerCase();
-  const list = document.getElementById("ac-list");
+  var raw  = document.getElementById('drug-name').value.trim();
+  var val  = raw.toLowerCase();
+  var list = document.getElementById('ac-list');
   acIdx = -1;
-  if (!val) { list.classList.remove("open"); list.innerHTML=""; return; }
-  const matches = drugs.filter(d => d.name.toLowerCase().includes(val));
-  if (!matches.length) { list.classList.remove("open"); list.innerHTML=""; return; }
-  list.innerHTML = matches.map((d,i) =>
-    `<div class="ac-item" onmousedown="acSelect(${JSON.stringify(d.name)})">
-      <span>${d.name}</span>
-      <span class="ac-item-stock">${d.stock} units</span>
-    </div>`
-  ).join("");
-  list.classList.add("open");
+  if (!val) { list.classList.remove('open'); list.innerHTML = ''; return; }
+
+  var matches    = drugs.filter(function(d) { return d.name.toLowerCase().includes(val); });
+  var exactMatch = drugs.some(function(d)   { return d.name.toLowerCase() === val; });
+
+  var html = matches.map(function(d) {
+    return '<div class="ac-item" data-name="' + d.name.replace(/"/g, '&quot;') + '">'
+         + '<span>' + d.name + '</span>'
+         + '<span class="ac-item-stock">' + d.stock + ' units</span>'
+         + '</div>';
+  }).join('');
+
+  if (!exactMatch && raw) {
+    html += '<div class="ac-item ac-new" data-name="__new__">'
+          + '<span>' + raw + '</span>'
+          + '<span class="ac-new-badge">+ ADD NEW</span>'
+          + '</div>';
+  }
+
+  if (!html) { list.classList.remove('open'); list.innerHTML = ''; return; }
+  list.innerHTML = html;
+  list.classList.add('open');
 }
-function acSelect(name) {
-  document.getElementById("drug-name").value = name;
-  document.getElementById("ac-list").classList.remove("open");
-  // Auto-fill stock and threshold from existing drug
-  const d = drugs.find(x => x.name === name);
-  if (d) {
-    document.getElementById("drug-stock").value = d.stock;
-    document.getElementById("drug-thresh").value = d.threshold;
+
+function acKey(e) {
+  var list  = document.getElementById('ac-list');
+  var items = list.querySelectorAll('.ac-item');
+  if (!items.length) return;
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    acIdx = Math.min(acIdx + 1, items.length - 1);
+    items.forEach(function(el, i) { el.classList.toggle('active', i === acIdx); });
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    acIdx = Math.max(acIdx - 1, 0);
+    items.forEach(function(el, i) { el.classList.toggle('active', i === acIdx); });
+  } else if (e.key === 'Enter' && acIdx >= 0) {
+    e.preventDefault();
+    items[acIdx].click();
+  } else if (e.key === 'Escape') {
+    list.classList.remove('open');
   }
 }
-function acKey(e) {
-  const list = document.getElementById("ac-list");
-  const items = list.querySelectorAll(".ac-item");
-  if (!items.length) return;
-  if (e.key === "ArrowDown") { e.preventDefault(); acIdx = Math.min(acIdx+1, items.length-1); items.forEach((el,i)=>el.classList.toggle("active",i===acIdx)); }
-  else if (e.key === "ArrowUp") { e.preventDefault(); acIdx = Math.max(acIdx-1, 0); items.forEach((el,i)=>el.classList.toggle("active",i===acIdx)); }
-  else if (e.key === "Enter" && acIdx >= 0) { e.preventDefault(); acSelect(drugs.filter(d=>d.name.toLowerCase().includes(document.getElementById("drug-name").value.trim().toLowerCase()))[acIdx].name); }
-  else if (e.key === "Escape") { list.classList.remove("open"); }
-}
-document.addEventListener("click", e => { if (!e.target.closest(".ac-wrap")) document.getElementById("ac-list").classList.remove("open"); });
+
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.ac-wrap')) document.getElementById('ac-list').classList.remove('open');
+});
+
 
 // ── DRUG MANAGEMENT ──────────────────────────────────────────────
 function addDrug() {
