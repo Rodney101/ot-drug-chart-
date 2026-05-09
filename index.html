@@ -375,14 +375,8 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
         </div>
         <p style="font-size:11px;color:var(--muted);margin-top:6px;line-height:1.6;">Paste your deployment URL. The app will push usage logs to Sheets <em>and</em> pull current stock levels back.</p>
       </div>
-      <div class="s-row">
-        <div><div class="s-info-label">Auto-push logs to Sheets</div><div class="s-info-sub">Sync each usage entry on submit</div></div>
-        <label class="toggle"><input type="checkbox" id="tog-push-log" checked/><span class="tslider"></span></label>
-      </div>
-      <div class="s-row">
-        <div><div class="s-info-label">Auto-pull stock from Sheets</div><div class="s-info-sub">Refresh stock levels every 5 minutes</div></div>
-        <label class="toggle"><input type="checkbox" id="tog-pull" checked/><span class="tslider"></span></label>
-      </div>
+
+
       <button class="btn btn-dark" onclick="syncFromSheets()" style="margin-top:4px;">
         <svg viewBox="0 0 24 24"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>
         Pull stock from Sheets now
@@ -395,14 +389,8 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
         <label>Alert email</label>
         <input type="email" id="cfg-email" placeholder="ot-lead@hospital.com"/>
       </div>
-      <div class="s-row">
-        <div><div class="s-info-label">Push notifications</div><div class="s-info-sub">Browser/phone alerts on low stock</div></div>
-        <label class="toggle"><input type="checkbox" id="tog-notif" onchange="toggleNotif(this)"/><span class="tslider"></span></label>
-      </div>
-      <div class="s-row">
-        <div><div class="s-info-label">Email on low stock</div><div class="s-info-sub">Via Apps Script trigger</div></div>
-        <label class="toggle"><input type="checkbox" id="tog-email" checked/><span class="tslider"></span></label>
-      </div>
+
+
       <div class="s-row" style="border:none;">
         <div><div class="s-info-label">Daily summary email</div><div class="s-info-sub">Morning stock report (set trigger in Apps Script)</div></div>
         <label class="toggle"><input type="checkbox" id="tog-daily" checked/><span class="tslider"></span></label>
@@ -582,7 +570,6 @@ function render() {
   // Settings fields
   if (settings.sheetUrl) document.getElementById('cfg-url').value = settings.sheetUrl;
   if (settings.alertEmail) document.getElementById('cfg-email').value = settings.alertEmail;
-  if (settings.pushEnabled) document.getElementById('tog-notif').checked = true;
 }
 
 // ── LOG USAGE ──────────────────────────────────────────────
@@ -609,7 +596,7 @@ function logUsage() {
   if (status(d)!=='ok') {
     if (settings.pushEnabled) push(`Low stock: ${d.name}`, `${d.stock} unit${d.stock!==1?'s':''} remaining — reorder needed.`);
   }
-  if (settings.sheetUrl && document.getElementById('tog-push-log').checked) {
+  if (settings.sheetUrl) {
     sendToSheets({ type:'activity', event: 'Drug Used', drug, qty, notes, stock: d.stock, threshold: d.threshold, ts: entry.ts });
     sendToSheets({ type:'stock', drug, stock: d.stock, threshold: d.threshold });
   }
@@ -833,7 +820,7 @@ async function syncFromSheets() {
 
 // Auto-pull every 5 minutes if enabled
 setInterval(()=>{
-  if (settings.sheetUrl && document.getElementById('tog-pull') && document.getElementById('tog-pull').checked) {
+  if (settings.sheetUrl) {
     syncFromSheets();
   }
 }, 5 * 60 * 1000);
