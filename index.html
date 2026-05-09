@@ -411,12 +411,7 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
 
 <script>
 // ── STATE ──────────────────────────────────────────────
-let drugs    = JSON.parse(localStorage.getItem('ot_drugs')    || 'null') || [
-  { name:'Paracetamol 500mg', stock:18, threshold:5 },
-  { name:'Ibuprofen 400mg',   stock:4,  threshold:5 },
-  { name:'Morphine 10mg/ml',  stock:2,  threshold:4 },
-  { name:'Metoclopramide',    stock:12, threshold:4 },
-];
+let drugs    = JSON.parse(localStorage.getItem('ot_drugs') || '[]');
 let logs     = JSON.parse(localStorage.getItem('ot_logs')     || '[]');
 let settings = JSON.parse(localStorage.getItem('ot_settings') || '{}');
 let qty      = 1;
