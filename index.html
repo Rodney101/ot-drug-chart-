@@ -191,11 +191,7 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
 .ac-item-new { color: var(--teal-d); }
 .ac-new-label { font-size: 11px; font-family: var(--font-head); font-weight: 700; background: var(--teal-l); color: var(--teal-d); padding: 2px 7px; border-radius: 99px; }
 .edit-btn { width: 28px; height: 28px; border-radius: 50%; border: none; background: var(--blue-l); cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--blue); flex-shrink: 0; }
-.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 500; display: none; align-items: center; justify-content: center; padding: 24px; }
-.modal-overlay.open { display: flex; }
-.modal { background: var(--white); border-radius: var(--r-lg); padding: 20px; width: 100%; max-width: 360px; box-shadow: 0 8px 32px rgba(0,0,0,0.2); }
-.modal-title { font-family: var(--font-head); font-size: 15px; font-weight: 700; color: var(--ink); margin-bottom: 14px; }
-.modal-btns { display: flex; gap: 8px; margin-top: 14px; }
+/* modal uses inline styles */
 </style>
 </head>
 <body>
@@ -427,14 +423,15 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
 </div>
 
 <!-- EDIT DRUG NAME MODAL -->
-<div class="modal-overlay" id="edit-modal" onclick="closeEditModal(event)">
-  <div class="modal" onclick="event.stopPropagation()">
-    <div class="modal-title">Edit drug name</div>
-    <div class="fg" style="margin-bottom:0;"><label>New name</label><input type="text" id="edit-drug-name" placeholder="Enter new drug name" autocomplete="off" onkeydown="if(event.key==='Enter')saveEditDrug()"/></div>
-    <div class="modal-btns">
-      <button class="btn btn-primary" onclick="saveEditDrug()" style="flex:2;">Save</button>
-      <button class="btn btn-ghost" onclick="document.getElementById('edit-modal').classList.remove('open')" style="flex:1;">Cancel</button>
-    </div>
+<!-- backdrop closes modal when tapped -->
+<div id="edit-backdrop" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:500;" onclick="closeEditModal()"></div>
+<!-- modal panel sits above backdrop -->
+<div id="edit-modal" style="display:none;position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);background:var(--white);border-radius:var(--r-lg);padding:20px;width:calc(100% - 48px);max-width:360px;z-index:501;box-shadow:0 8px 32px rgba(0,0,0,0.2);">
+  <div style="font-family:var(--font-head);font-size:15px;font-weight:700;color:var(--ink);margin-bottom:14px;">Edit drug name</div>
+  <div style="margin-bottom:14px;"><label>New name</label><input type="text" id="edit-drug-name" placeholder="Enter new drug name" autocomplete="off" onkeydown="if(event.key==='Enter')saveEditDrug()"/></div>
+  <div style="display:flex;gap:8px;">
+    <button class="btn btn-primary" onclick="saveEditDrug()" style="flex:2;width:auto;">Save</button>
+    <button class="btn btn-ghost" onclick="closeEditModal()" style="flex:1;width:auto;">Cancel</button>
   </div>
 </div>
 
@@ -442,15 +439,17 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
 
 <script>
 // ── STATE ──────────────────────────────────────────────
-let drugs    = JSON.parse(localStorage.getItem('ot_drugs') || '[]');
+let drugs    = JSON.parse(localStorage.getItem('ot_drugs')    || '[]');
 let logs     = JSON.parse(localStorage.getItem('ot_logs')     || '[]');
+let activity = JSON.parse(localStorage.getItem('ot_activity') || '[]');
 let settings = JSON.parse(localStorage.getItem('ot_settings') || '{}');
 let qty      = 1;
 let lastSync = localStorage.getItem('ot_last_sync') || null;
 
 function persist() {
-  localStorage.setItem('ot_drugs', JSON.stringify(drugs));
-  localStorage.setItem('ot_logs',  JSON.stringify(logs));
+  localStorage.setItem('ot_drugs',    JSON.stringify(drugs));
+  localStorage.setItem('ot_logs',     JSON.stringify(logs));
+  localStorage.setItem('ot_activity', JSON.stringify(activity));
   localStorage.setItem('ot_settings', JSON.stringify(settings));
 }
 
@@ -513,15 +512,23 @@ function render() {
     snb.style.display='block';
   }
 
-  // Recent logs
+  // Recent activity (usage + stock events)
   const rl = document.getElementById('recent-logs');
-  rl.innerHTML = !logs.length
-    ? '<div class="empty"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>No usage logged yet</div>'
-    : logs.slice(-6).reverse().map(l=>`
-      <div class="log-item">
-        <div class="log-top"><span class="log-name">${l.drug}</span><span class="log-qty">−${l.qty}</span></div>
-        <div class="log-meta">${new Date(l.ts).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})}${l.notes?' · '+l.notes:''}</div>
-      </div>`).join('');
+  const _fmtTime = ts => {
+    const d = new Date(ts);
+    const _d = ['Sun.','Mon.','Tue.','Wed.','Thu.','Fri.','Sat.'];
+    const _m = ['Jan.','Feb.','Mar.','Apr.','May','Jun.','Jul.','Aug.','Sep.','Oct.','Nov.','Dec.'];
+    return _d[d.getDay()]+' '+_m[d.getMonth()]+' '+d.getDate()+', '+d.getFullYear()+' '+d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:true});
+  };
+  rl.innerHTML = !activity.length
+    ? '<div class="empty"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>No activity yet</div>'
+    : activity.slice(-8).reverse().map(a => {
+        if (a.kind === 'usage') {
+          return '<div class="log-item"><div class="log-top"><span class="log-name">'+a.drug+'</span><span class="log-qty">&#8722;'+a.qty+' used</span></div><div class="log-meta">'+_fmtTime(a.ts)+(a.notes?' &middot; '+a.notes:'')+'</div></div>';
+        } else {
+          return '<div class="log-item"><div class="log-top"><span class="log-name">'+a.drug+'</span><span class="log-qty" style="background:var(--blue-l);color:#1d4ed8;">'+(a.verb||'Updated')+'</span></div><div class="log-meta">'+_fmtTime(a.ts)+' &middot; Stock: '+a.stock+' &middot; Reorder at: '+a.threshold+'</div></div>';
+        }
+      }).join('');
 
   // Drug select
   const sel = document.getElementById('log-drug');
@@ -591,6 +598,7 @@ function logUsage() {
   drugs[idx].stock -= qty;
   const entry = { drug, qty, notes, ts: new Date().toISOString() };
   logs.push(entry);
+  activity.push({ kind:'usage', drug, qty, notes, ts: entry.ts });
   persist();
   document.getElementById('log-drug').value='';
   document.getElementById('log-notes').value='';
@@ -665,7 +673,8 @@ let _editIdx = -1;
 function editDrug(i) {
   _editIdx = i;
   document.getElementById('edit-drug-name').value = drugs[i].name;
-  document.getElementById('edit-modal').classList.add('open');
+  document.getElementById('edit-backdrop').style.display = 'block';
+  document.getElementById('edit-modal').style.display = 'block';
   setTimeout(() => document.getElementById('edit-drug-name').focus(), 80);
 }
 function saveEditDrug() {
@@ -681,15 +690,18 @@ function saveEditDrug() {
   activity.push({ kind:'stock', drug: newName, stock, threshold, verb: 'Renamed', ts: new Date().toISOString() });
   // Close modal FIRST, then persist/render so modal overlay click handler
   // doesn't interfere with the save
-  document.getElementById('edit-modal').classList.remove('open');
+  document.getElementById('edit-backdrop').style.display = 'none';
+  document.getElementById('edit-modal').style.display = 'none';
   _editIdx = -1;
   persist();
   render();
   toast('Drug renamed ✓');
   if (settings.sheetUrl) sendToSheets({ type:'rename', oldName, newName, stock, threshold });
 }
-function closeEditModal(e) {
-  if (e.target === document.getElementById('edit-modal')) document.getElementById('edit-modal').classList.remove('open');
+function closeEditModal() {
+  document.getElementById('edit-backdrop').style.display = 'none';
+  document.getElementById('edit-modal').style.display = 'none';
+  _editIdx = -1;
 }
 function removeDrug(i) {
   if (!confirm('Remove '+drugs[i].name+'?')) return;
