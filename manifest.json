@@ -1,11 +1,11 @@
 {
   "name": "OT Drug Chart",
-  "short_name": "Drug Chart",
-  "description": "OT Department Drug Chart Management",
+  "short_name": "OT Drugs",
+  "description": "OT Department Drug Chart — bidirectional Google Sheets sync",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0f3d2e",
-  "theme_color": "#0f3d2e",
+  "background_color": "#1a1a2e",
+  "theme_color": "#1a1a2e",
   "orientation": "portrait-primary",
   "icons": [
     { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },

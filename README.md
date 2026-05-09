@@ -1,103 +1,100 @@
-# OT Drug Chart — PWA Deployment Guide
+# OT Drug Chart v2 — Deployment Guide
 
-## What's in this folder
+## What changed in v2
+- ✅ Log Use tab simplified — no staff name or patient/reference fields
+- ✅ **Bidirectional Google Sheets sync** — app pushes logs TO Sheets AND pulls stock FROM Sheets
+- ✅ Auto-pull every 5 minutes when connected
+- ✅ Manual "Pull from Sheets" button on Stock tab and dashboard
+- ✅ Sync status bar shows last sync time
 
+---
+
+## Files
 ```
-ot-drug-chart/
-├── index.html        ← Main app (all logic + UI)
-├── manifest.json     ← PWA install config
-├── sw.js             ← Service worker (offline + push notifications)
+ot-drug-chart-v2/
+├── index.html       ← Full PWA app
+├── manifest.json    ← Install config
+├── sw.js            ← Service worker (offline + push)
+├── Code.gs          ← Google Apps Script (copy this into Apps Script)
 ├── icons/
-│   ├── icon-192.png  ← App icon (home screen)
-│   └── icon-512.png  ← App icon (splash screen)
-└── README.md         ← This file
+│   ├── icon-192.png
+│   └── icon-512.png
+└── README.md
 ```
 
 ---
 
-## Deploy to Netlify (recommended — free, 5 minutes)
+## Deploy (5 minutes, free)
 
-1. Go to **netlify.com** and sign up free
-2. Click **"Add new site" → "Deploy manually"**
-3. Drag and drop the entire `ot-drug-chart` folder onto the page
-4. Netlify gives you a URL like `https://ot-drug-chart.netlify.app`
-5. Share that URL with all OT staff
+**Netlify (easiest):**
+1. Go to netlify.com → sign up free
+2. "Add new site" → "Deploy manually"
+3. Drag the `ot-drug-chart-v2` folder onto the page
+4. Get your URL (e.g. `https://ot-drugs.netlify.app`) → share with staff
 
-That's it. Done.
-
----
-
-## Deploy to GitHub Pages (also free)
-
-1. Create a free account at **github.com**
-2. Click **New repository** → name it `ot-drug-chart` → Public → Create
-3. Upload all files (drag and drop in the browser)
-4. Go to **Settings → Pages → Source: main branch → /root**
-5. Your URL: `https://yourusername.github.io/ot-drug-chart`
+**GitHub Pages:**
+1. New repo → upload all files → Settings → Pages → main branch
 
 ---
 
-## Install on phones (staff instructions)
+## Google Sheets setup (bidirectional sync)
 
-### Android (Chrome)
-1. Open the app URL in Chrome
-2. Tap the 3-dot menu → "Add to Home screen"
-3. Tap "Add" — the app icon appears on your home screen
+### 1. Create the sheet
+- New sheet named `OT Drug Chart`
+- Create two tabs: `Logs` and `Stock`
 
-### iPhone (Safari)
-1. Open the app URL in Safari (must be Safari, not Chrome)
-2. Tap the Share button (box with arrow at bottom)
-3. Scroll down → "Add to Home Screen"
-4. Tap "Add" — the app icon appears on your home screen
+**Logs tab — row 1 headers:**
+| Timestamp | Drug | Qty Used | Notes | Stock After | Threshold |
 
-The app then works like a native app — full screen, no browser bar, works offline.
+**Stock tab — row 1 headers:**
+| Drug | Stock | Threshold | Max |
 
----
+### 2. Paste the Apps Script
+- Extensions → Apps Script → delete existing → paste `Code.gs` contents
+- Change `ALERT_EMAIL` to the OT lead's email
 
-## Connect to Google Sheets
+### 3. Deploy as Web App
+- Deploy → New deployment → Type: Web app
+- Execute as: **Me**
+- Who has access: **Anyone**
+- Click Deploy → **copy the URL**
 
-1. Create your Google Sheet with two tabs: `Logs` and `Stock`
-2. Add headers:
-   - Logs tab: Timestamp | Drug | Qty Used | Staff | Patient | Notes
-   - Stock tab: Drug | Stock | Threshold | Max
-3. Go to Extensions → Apps Script → paste the Code.gs script
-4. Deploy → New deployment → Web app → Anyone → Copy URL
-5. In the OT Drug Chart app → Settings tab → paste the URL → Save
-
-Every log entry now syncs automatically to your sheet.
+### 4. Connect the app
+- Open the OT Drug Chart app → Settings (CONFIG tab)
+- Paste the URL → Save
+- Tap "Pull stock from Sheets now" to test
 
 ---
 
-## Enable email alerts
+## How bidirectional sync works
 
-In your Apps Script (Code.gs):
-- Change `ALERT_EMAIL` to the OT lead's email address
-- Add a trigger: Extensions → Apps Script → Triggers → Add trigger
-  - Function: `sendDailySummary`
-  - Time-driven: Day timer, 7am–8am
+| Direction | When | What |
+|-----------|------|------|
+| App → Sheets | On every log entry | Writes to Logs tab, updates Stock tab |
+| App → Sheets | On every stock edit | Updates Stock tab |
+| Sheets → App | Every 5 minutes (auto) | Reads Stock tab, updates app |
+| Sheets → App | Manual tap | "Pull from Sheets" button |
 
----
-
-## Enable push notifications (phones)
-
-1. Open the app on the phone
-2. Go to Settings tab
-3. Toggle "Push notifications" ON
-4. Accept the permission prompt
-5. Test with the "Send test notification" button in the Alerts tab
-
-Notifications fire automatically when any drug drops to or below its reorder threshold.
+**The Stock tab in Google Sheets is the single source of truth.** 
+A pharmacist or manager can update quantities directly in the sheet, and the app will pull those changes automatically.
 
 ---
 
-## Features
+## Email alerts
 
-- ✅ Works offline (data stored on device)
-- ✅ Syncs to Google Sheets when online
-- ✅ Email alerts on low/critical stock
-- ✅ Push notifications on phone
-- ✅ Daily stock summary email
-- ✅ Installs as a home screen app (no App Store needed)
-- ✅ Works on Android and iPhone
-- ✅ Prevents over-ordering with max stock levels
-- ✅ Full audit log of all usage
+- **Low stock alert** — fires automatically when any drug hits or drops to its threshold
+- **Daily summary** — add a trigger in Apps Script: Triggers → Add trigger → `sendDailySummary` → Time-driven → Day timer → 7am–8am
+
+---
+
+## Install on phones
+
+**Android (Chrome):** Open URL → 3-dot menu → Add to Home Screen
+
+**iPhone (Safari):** Open URL → Share button → Add to Home Screen
+
+---
+
+## Push notifications
+
+Settings → Push notifications toggle → Accept permission → test in Alerts tab

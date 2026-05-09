@@ -3,233 +3,229 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
-<meta name="theme-color" content="#0f3d2e"/>
+<meta name="theme-color" content="#1a1a2e"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-<meta name="apple-mobile-web-app-title" content="OT Drug Chart"/>
-<meta name="description" content="OT Department Drug Chart Management"/>
+<meta name="apple-mobile-web-app-title" content="OT Drugs"/>
 <link rel="manifest" href="manifest.json"/>
 <link rel="apple-touch-icon" href="icons/icon-192.png"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
 <title>OT Drug Chart</title>
 <style>
 :root {
-  --green-900: #0a2a1e;
-  --green-800: #0f3d2e;
-  --green-700: #145240;
-  --green-600: #1a6b52;
-  --green-500: #1f8463;
-  --green-400: #27a87e;
-  --green-200: #7dd4b8;
-  --green-100: #b8ead8;
-  --green-50:  #e8f7f2;
-  --amber-500: #d97706;
-  --amber-100: #fef3c7;
-  --red-500:   #dc2626;
-  --red-100:   #fee2e2;
-  --blue-500:  #2563eb;
-  --blue-100:  #dbeafe;
-  --gray-900:  #111827;
-  --gray-700:  #374151;
-  --gray-500:  #6b7280;
-  --gray-300:  #d1d5db;
-  --gray-100:  #f3f4f6;
-  --gray-50:   #f9fafb;
+  --ink:       #0d0d1a;
+  --ink-2:     #1a1a2e;
+  --ink-3:     #252545;
+  --mid:       #5a5a8a;
+  --muted:     #9090b8;
+  --border:    #e0e0f0;
+  --surface:   #f7f7fc;
   --white:     #ffffff;
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 24px;
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
-  --shadow-md: 0 4px 16px rgba(0,0,0,0.10);
-  --font: 'DM Sans', sans-serif;
-  --mono: 'DM Mono', monospace;
-  --safe-top: env(safe-area-inset-top, 0px);
-  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --teal:      #00b894;
+  --teal-d:    #00917a;
+  --teal-l:    #d4f5ee;
+  --amber:     #f59e0b;
+  --amber-l:   #fef3c7;
+  --red:       #ef4444;
+  --red-l:     #fee2e2;
+  --blue:      #3b82f6;
+  --blue-l:    #dbeafe;
+  --r-sm: 10px; --r-md: 14px; --r-lg: 20px; --r-xl: 28px;
+  --font-head: 'Syne', sans-serif;
+  --font-body: 'Instrument Sans', sans-serif;
+  --safe-t: env(safe-area-inset-top, 0px);
+  --safe-b: env(safe-area-inset-bottom, 0px);
 }
-* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 html, body { height: 100%; overflow: hidden; }
-body { font-family: var(--font); background: var(--gray-50); color: var(--gray-900); display: flex; flex-direction: column; }
+body { font-family: var(--font-body); background: var(--surface); color: var(--ink); display: flex; flex-direction: column; }
 
-/* ── HEADER ── */
-.header {
-  background: var(--green-800);
-  color: var(--white);
-  padding: calc(16px + var(--safe-top)) 20px 16px;
+/* HEADER */
+.hdr {
+  background: var(--ink-2);
+  padding: calc(14px + var(--safe-t)) 20px 14px;
   display: flex; align-items: flex-end; justify-content: space-between;
   flex-shrink: 0;
 }
-.header-title { font-size: 20px; font-weight: 600; letter-spacing: -0.3px; }
-.header-sub { font-size: 12px; opacity: 0.65; margin-top: 2px; }
-.header-badge { background: rgba(255,255,255,0.15); border-radius: 99px; padding: 4px 10px; font-size: 12px; font-weight: 500; display: flex; align-items: center; gap: 5px; }
-.header-badge.alert { background: var(--red-500); }
+.hdr-title { font-family: var(--font-head); font-size: 22px; font-weight: 700; color: var(--white); letter-spacing: -0.5px; }
+.hdr-sub { font-size: 11px; color: var(--muted); margin-top: 2px; font-family: var(--font-body); }
+.hdr-pill { display: flex; align-items: center; gap: 5px; background: var(--red); color: white; border-radius: 99px; padding: 4px 11px; font-size: 11px; font-weight: 600; font-family: var(--font-head); display: none; }
 
-/* ── TABS ── */
-.tabs {
-  background: var(--white);
-  display: flex;
-  border-bottom: 1px solid var(--gray-300);
-  flex-shrink: 0;
-  overflow-x: auto;
-  scrollbar-width: none;
-}
-.tabs::-webkit-scrollbar { display: none; }
-.tab { flex: 1; min-width: 72px; padding: 12px 6px; font-size: 11px; font-weight: 500; color: var(--gray-500); border: none; background: none; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; border-bottom: 2px solid transparent; font-family: var(--font); transition: color 0.15s; white-space: nowrap; }
+/* SYNC BAR */
+.sync-bar { background: var(--ink-3); color: var(--muted); font-size: 11px; padding: 6px 20px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; font-family: var(--font-body); }
+.sync-bar span { display: flex; align-items: center; gap: 5px; }
+.sync-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--muted); flex-shrink: 0; }
+.sync-dot.ok { background: var(--teal); }
+.sync-dot.err { background: var(--red); }
+.sync-dot.spin { animation: pulse 1s infinite; background: var(--amber); }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+.sync-now-btn { background: none; border: none; color: var(--teal); font-size: 11px; font-weight: 600; cursor: pointer; font-family: var(--font-head); padding: 0; }
+
+/* TABS */
+.tabs { background: var(--white); display: flex; border-bottom: 1.5px solid var(--border); flex-shrink: 0; }
+.tab { flex: 1; padding: 11px 4px 10px; font-size: 10px; font-weight: 600; color: var(--muted); border: none; background: none; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; border-bottom: 2px solid transparent; margin-bottom: -1.5px; font-family: var(--font-head); letter-spacing: 0.3px; transition: color 0.15s; position: relative; }
 .tab svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-.tab.active { color: var(--green-600); border-bottom-color: var(--green-600); }
-.tab .tab-alert { background: var(--red-500); color: white; border-radius: 99px; font-size: 9px; padding: 0px 5px; position: absolute; top: 8px; right: calc(50% - 18px); }
+.tab.active { color: var(--teal-d); border-bottom-color: var(--teal); }
+.t-dot { position: absolute; top: 7px; right: calc(50% - 16px); background: var(--red); color: white; border-radius: 99px; font-size: 8px; padding: 1px 4px; font-family: var(--font-head); display: none; }
 
-/* ── CONTENT ── */
+/* CONTENT */
 .content { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
-.section { display: none; padding: 16px; padding-bottom: calc(20px + var(--safe-bottom)); }
+.section { display: none; padding: 16px; padding-bottom: calc(24px + var(--safe-b)); }
 .section.active { display: block; }
 
-/* ── CARDS ── */
-.card { background: var(--white); border-radius: var(--radius-lg); border: 1px solid var(--gray-300); padding: 16px; margin-bottom: 12px; box-shadow: var(--shadow-sm); }
-.card-title { font-size: 14px; font-weight: 600; color: var(--gray-700); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
-.card-title svg { width: 16px; height: 16px; stroke: var(--green-600); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+/* CARDS */
+.card { background: var(--white); border-radius: var(--r-lg); border: 1.5px solid var(--border); padding: 16px; margin-bottom: 12px; }
+.card-hd { font-family: var(--font-head); font-size: 13px; font-weight: 700; color: var(--ink); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; letter-spacing: 0.2px; }
+.card-hd svg { width: 15px; height: 15px; stroke: var(--teal-d); fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
 
-/* ── METRIC GRID ── */
+/* METRICS */
 .metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
-.metric { background: var(--white); border-radius: var(--radius-md); border: 1px solid var(--gray-300); padding: 14px; box-shadow: var(--shadow-sm); }
-.metric-label { font-size: 11px; color: var(--gray-500); font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
-.metric-val { font-size: 28px; font-weight: 600; color: var(--gray-900); line-height: 1; }
-.metric-val.warn { color: var(--amber-500); }
-.metric-val.danger { color: var(--red-500); }
-.metric-val.ok { color: var(--green-600); }
+.metric { background: var(--white); border-radius: var(--r-md); border: 1.5px solid var(--border); padding: 14px 16px; }
+.metric-lbl { font-family: var(--font-head); font-size: 10px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 5px; }
+.metric-val { font-family: var(--font-head); font-size: 32px; font-weight: 700; color: var(--ink); line-height: 1; }
+.metric-val.ok  { color: var(--teal-d); }
+.metric-val.warn{ color: var(--amber); }
+.metric-val.bad { color: var(--red); }
 
-/* ── BADGES ── */
-.badge { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 99px; }
-.badge-ok { background: #dcfce7; color: #15803d; }
-.badge-warn { background: var(--amber-100); color: #92400e; }
-.badge-danger { background: var(--red-100); color: #991b1b; }
-.badge-info { background: var(--blue-100); color: #1d4ed8; }
+/* BADGES */
+.badge { display: inline-flex; align-items: center; font-family: var(--font-head); font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 99px; letter-spacing: 0.3px; }
+.b-ok   { background: var(--teal-l);  color: var(--teal-d); }
+.b-warn { background: var(--amber-l); color: #92400e; }
+.b-bad  { background: var(--red-l);   color: #991b1b; }
+.b-blue { background: var(--blue-l);  color: #1d4ed8; }
 
-/* ── FORMS ── */
-.form-group { margin-bottom: 12px; }
-.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
-label { display: block; font-size: 12px; font-weight: 600; color: var(--gray-700); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.4px; }
-input, select, textarea {
-  width: 100%; padding: 11px 13px; border: 1.5px solid var(--gray-300);
-  border-radius: var(--radius-sm); font-size: 15px; font-family: var(--font);
-  color: var(--gray-900); background: var(--white); outline: none;
-  transition: border-color 0.15s;
-}
-input:focus, select:focus { border-color: var(--green-500); }
-select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 36px; }
+/* FORMS */
+.fg { margin-bottom: 13px; }
+label { display: block; font-family: var(--font-head); font-size: 10px; font-weight: 700; color: var(--mid); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.6px; }
+input, select, textarea { width: 100%; padding: 12px 14px; border: 1.5px solid var(--border); border-radius: var(--r-sm); font-size: 15px; font-family: var(--font-body); color: var(--ink); background: var(--white); outline: none; transition: border-color 0.15s; }
+input:focus, select:focus, textarea:focus { border-color: var(--teal); }
+select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%239090b8' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 36px; }
+.fr { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 13px; }
 
-/* ── BUTTONS ── */
-.btn { display: inline-flex; align-items: center; justify-content: center; gap: 7px; padding: 13px 20px; border-radius: var(--radius-md); font-size: 15px; font-weight: 600; font-family: var(--font); cursor: pointer; border: none; transition: opacity 0.15s, transform 0.1s; width: 100%; }
-.btn:active { transform: scale(0.98); }
-.btn-primary { background: var(--green-700); color: var(--white); }
-.btn-primary:hover { background: var(--green-600); }
-.btn-secondary { background: var(--gray-100); color: var(--gray-700); border: 1px solid var(--gray-300); }
-.btn-danger { background: var(--red-100); color: var(--red-500); }
-.btn svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+/* BUTTONS */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 7px; padding: 13px 20px; border-radius: var(--r-md); font-size: 14px; font-weight: 600; font-family: var(--font-head); cursor: pointer; border: none; width: 100%; transition: opacity 0.15s, transform 0.1s; letter-spacing: 0.2px; }
+.btn:active { transform: scale(0.97); }
+.btn svg { width: 17px; height: 17px; stroke: currentColor; fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.btn-primary { background: var(--teal); color: var(--white); }
+.btn-primary:hover { background: var(--teal-d); }
+.btn-dark { background: var(--ink-2); color: var(--white); }
+.btn-ghost { background: var(--surface); color: var(--mid); border: 1.5px solid var(--border); }
+.btn-sm { padding: 9px 16px; font-size: 12px; width: auto; }
 
-/* ── QTY CONTROL ── */
-.qty-ctrl { display: flex; align-items: center; gap: 14px; }
-.qty-btn { width: 38px; height: 38px; border-radius: 50%; border: 1.5px solid var(--gray-300); background: var(--white); font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--gray-700); font-weight: 300; transition: border-color 0.15s; }
-.qty-btn:active { background: var(--gray-100); }
-.qty-val { font-size: 22px; font-weight: 600; min-width: 32px; text-align: center; color: var(--gray-900); }
+/* QTY */
+.qty-ctrl { display: flex; align-items: center; gap: 12px; margin-top: 2px; }
+.qty-btn { width: 40px; height: 40px; border-radius: 50%; border: 1.5px solid var(--border); background: var(--white); font-size: 22px; font-weight: 300; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--ink-2); transition: border-color 0.15s; }
+.qty-btn:active { background: var(--surface); }
+.qty-val { font-family: var(--font-head); font-size: 24px; font-weight: 700; min-width: 36px; text-align: center; color: var(--ink); }
 
-/* ── DRUG LIST ── */
-.drug-item { padding: 12px 0; border-bottom: 1px solid var(--gray-100); display: flex; align-items: center; gap: 12px; }
-.drug-item:last-child { border-bottom: none; }
-.drug-info { flex: 1; min-width: 0; }
-.drug-name { font-size: 14px; font-weight: 600; color: var(--gray-900); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.drug-meta { font-size: 12px; color: var(--gray-500); margin-top: 2px; }
-.stock-bar-wrap { width: 56px; height: 5px; background: var(--gray-200); border-radius: 99px; overflow: hidden; flex-shrink: 0; }
-.stock-bar { height: 100%; border-radius: 99px; transition: width 0.3s; }
-.del-btn { width: 30px; height: 30px; border-radius: 50%; border: none; background: var(--gray-100); cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--gray-400); font-size: 14px; flex-shrink: 0; }
+/* DRUG LIST */
+.drug-item { padding: 13px 0; border-bottom: 1.5px solid var(--surface); display: flex; align-items: center; gap: 10px; }
+.drug-item:last-child { border-bottom: none; padding-bottom: 0; }
+.di-info { flex: 1; min-width: 0; }
+.di-name { font-family: var(--font-head); font-size: 14px; font-weight: 600; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.di-meta { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.bar-wrap { width: 52px; height: 4px; background: var(--border); border-radius: 99px; overflow: hidden; flex-shrink: 0; }
+.bar-fill { height: 100%; border-radius: 99px; transition: width 0.4s; }
+.del-btn { width: 28px; height: 28px; border-radius: 50%; border: none; background: var(--surface); cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 13px; flex-shrink: 0; }
 
-/* ── LOG ROWS ── */
-.log-item { padding: 11px 0; border-bottom: 1px solid var(--gray-100); }
+/* LOG ROWS */
+.log-item { padding: 11px 0; border-bottom: 1.5px solid var(--surface); }
 .log-item:last-child { border-bottom: none; }
 .log-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 3px; }
-.log-drug { font-size: 14px; font-weight: 600; color: var(--gray-900); }
-.log-qty { font-size: 12px; font-weight: 500; font-family: var(--mono); background: var(--green-50); color: var(--green-700); padding: 2px 7px; border-radius: 4px; }
-.log-meta { font-size: 12px; color: var(--gray-500); }
+.log-name { font-family: var(--font-head); font-size: 13px; font-weight: 600; color: var(--ink); }
+.log-qty { font-size: 11px; font-weight: 700; font-family: var(--font-head); background: var(--teal-l); color: var(--teal-d); padding: 2px 8px; border-radius: 99px; }
+.log-meta { font-size: 11px; color: var(--muted); }
 
-/* ── ALERT ITEMS ── */
-.alert-item { display: flex; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--gray-100); align-items: flex-start; }
+/* ALERTS */
+.alert-item { display: flex; gap: 12px; padding: 13px 0; border-bottom: 1.5px solid var(--surface); align-items: flex-start; }
 .alert-item:last-child { border-bottom: none; }
-.alert-icon { width: 36px; height: 36px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-.alert-icon svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-.alert-icon.danger { background: var(--red-100); color: var(--red-500); }
-.alert-icon.warn { background: var(--amber-100); color: var(--amber-500); }
-.alert-text { font-size: 14px; font-weight: 500; color: var(--gray-900); }
-.alert-sub { font-size: 12px; color: var(--gray-500); margin-top: 3px; }
+.alert-ico { width: 36px; height: 36px; border-radius: var(--r-sm); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.alert-ico svg { width: 17px; height: 17px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.alert-ico.bad  { background: var(--red-l);   color: var(--red); }
+.alert-ico.warn { background: var(--amber-l); color: var(--amber); }
+.alert-txt { font-family: var(--font-head); font-size: 13px; font-weight: 600; color: var(--ink); }
+.alert-sub { font-size: 11px; color: var(--muted); margin-top: 3px; }
 
-/* ── TOAST ── */
-.toast { position: fixed; top: calc(80px + var(--safe-top)); left: 50%; transform: translateX(-50%) translateY(-20px); background: var(--green-800); color: white; padding: 10px 20px; border-radius: 99px; font-size: 14px; font-weight: 500; opacity: 0; pointer-events: none; transition: opacity 0.2s, transform 0.2s; z-index: 999; white-space: nowrap; box-shadow: var(--shadow-md); }
-.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-/* ── BANNER ── */
-.banner { background: linear-gradient(135deg, var(--green-800), var(--green-600)); color: white; border-radius: var(--radius-lg); padding: 16px; margin-bottom: 12px; display: flex; align-items: center; gap: 12px; }
-.banner svg { width: 24px; height: 24px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; opacity: 0.9; }
-.banner-text { flex: 1; font-size: 13px; line-height: 1.5; opacity: 0.95; }
-.banner-btn { background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); color: white; border-radius: var(--radius-sm); padding: 7px 14px; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; font-family: var(--font); }
-
-/* ── SETTINGS ROWS ── */
-.setting-row { display: flex; align-items: center; justify-content: space-between; padding: 14px 0; border-bottom: 1px solid var(--gray-100); gap: 12px; }
-.setting-row:last-child { border-bottom: none; }
-.setting-info { flex: 1; }
-.setting-label { font-size: 14px; font-weight: 500; color: var(--gray-900); }
-.setting-sub { font-size: 12px; color: var(--gray-500); margin-top: 2px; }
+/* SETTINGS */
+.s-label { font-family: var(--font-head); font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; margin: 16px 0 8px; }
+.s-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 13px 0; border-bottom: 1.5px solid var(--surface); }
+.s-row:last-child { border-bottom: none; }
+.s-info-label { font-family: var(--font-head); font-size: 13px; font-weight: 600; color: var(--ink); }
+.s-info-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
 .toggle { position: relative; width: 44px; height: 26px; flex-shrink: 0; }
 .toggle input { opacity: 0; width: 0; height: 0; }
-.toggle-slider { position: absolute; inset: 0; background: var(--gray-300); border-radius: 99px; cursor: pointer; transition: background 0.2s; }
-.toggle-slider:before { content: ''; position: absolute; width: 20px; height: 20px; left: 3px; top: 3px; background: white; border-radius: 50%; transition: transform 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
-.toggle input:checked + .toggle-slider { background: var(--green-500); }
-.toggle input:checked + .toggle-slider:before { transform: translateX(18px); }
+.tslider { position: absolute; inset: 0; background: var(--border); border-radius: 99px; cursor: pointer; transition: background 0.2s; }
+.tslider:before { content: ''; position: absolute; width: 20px; height: 20px; left: 3px; top: 3px; background: white; border-radius: 50%; transition: transform 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+.toggle input:checked + .tslider { background: var(--teal); }
+.toggle input:checked + .tslider:before { transform: translateX(18px); }
+.url-row { display: flex; gap: 8px; }
+.url-row input { flex: 1; font-size: 12px; }
+.url-row .btn { width: auto; padding: 0 16px; font-size: 12px; }
 
-.empty { text-align: center; padding: 28px 0; color: var(--gray-500); font-size: 14px; }
-.empty svg { width: 32px; height: 32px; stroke: var(--gray-300); fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; margin: 0 auto 8px; display: block; }
+/* TOAST */
+.toast { position: fixed; top: calc(76px + var(--safe-t)); left: 50%; transform: translateX(-50%) translateY(-12px); background: var(--ink-2); color: white; padding: 10px 20px; border-radius: 99px; font-family: var(--font-head); font-size: 13px; font-weight: 600; opacity: 0; pointer-events: none; transition: opacity 0.2s, transform 0.2s; z-index: 999; white-space: nowrap; box-shadow: 0 4px 20px rgba(0,0,0,0.25); }
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-.sheet-url-wrap { display: flex; gap: 8px; }
-.sheet-url-wrap input { flex: 1; font-size: 13px; font-family: var(--mono); }
-.sheet-url-wrap button { flex-shrink: 0; width: auto; padding: 0 14px; }
+/* SYNC STATUS CARD */
+.sync-card { background: var(--ink-3); border-radius: var(--r-lg); padding: 16px; margin-bottom: 12px; display: flex; align-items: center; gap: 12px; border: 1.5px solid rgba(255,255,255,0.05); }
+.sync-card svg { width: 22px; height: 22px; stroke: var(--teal); fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+.sc-title { font-family: var(--font-head); font-size: 13px; font-weight: 700; color: var(--white); }
+.sc-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.sc-btn { background: rgba(0,184,148,0.2); border: 1px solid rgba(0,184,148,0.3); color: var(--teal); border-radius: var(--r-sm); padding: 7px 14px; font-size: 12px; font-weight: 700; cursor: pointer; white-space: nowrap; font-family: var(--font-head); margin-left: auto; flex-shrink: 0; }
 
-.section-label { font-size: 11px; font-weight: 600; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 8px; margin-top: 4px; }
+/* EMPTY */
+.empty { text-align: center; padding: 28px 0; color: var(--muted); font-size: 13px; font-family: var(--font-head); }
+.empty svg { width: 32px; height: 32px; stroke: var(--border); fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; margin: 0 auto 10px; display: block; }
+
+/* PULL TO SYNC hint */
+.pull-hint { text-align: center; font-size: 11px; color: var(--muted); padding: 8px 0 0; font-family: var(--font-head); display: flex; align-items: center; justify-content: center; gap: 5px; }
+.pull-hint svg { width: 13px; height: 13px; stroke: var(--muted); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 </style>
 </head>
 <body>
 
-<div class="header">
+<!-- HEADER -->
+<div class="hdr">
   <div>
-    <div class="header-title">OT Drug Chart</div>
-    <div class="header-sub" id="header-date"></div>
+    <div class="hdr-title">OT Drug Chart</div>
+    <div class="hdr-sub" id="hdr-date"></div>
   </div>
-  <div class="header-badge" id="header-alert-badge" style="display:none;">
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-    <span id="header-alert-count">0</span> alert(s)
+  <div class="hdr-pill" id="hdr-pill">
+    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    <span id="hdr-pill-n">0</span> ALERT
   </div>
 </div>
 
+<!-- SYNC BAR -->
+<div class="sync-bar">
+  <span><span class="sync-dot" id="sync-dot"></span><span id="sync-status-txt">Not connected to Sheets</span></span>
+  <button class="sync-now-btn" onclick="syncFromSheets()" id="sync-now-btn" style="display:none;">Sync now ↺</button>
+</div>
+
+<!-- TABS -->
 <div class="tabs">
-  <button class="tab active" onclick="switchTab('dashboard')" style="position:relative;">
+  <button class="tab active" onclick="go('dashboard')">
     <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-    Dashboard
+    DASH
   </button>
-  <button class="tab" onclick="switchTab('log')" style="position:relative;">
+  <button class="tab" onclick="go('log')">
     <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
-    Log Use
+    LOG USE
   </button>
-  <button class="tab" onclick="switchTab('stock')" style="position:relative;">
+  <button class="tab" onclick="go('stock')">
     <svg viewBox="0 0 24 24"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
-    Stock
+    STOCK
   </button>
-  <button class="tab" onclick="switchTab('alerts')" style="position:relative;" id="tab-alerts-btn">
+  <button class="tab" onclick="go('alerts')" id="tab-alerts-btn">
     <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-    Alerts
-    <span class="tab-alert" id="tab-alert-dot" style="display:none;"></span>
+    ALERTS
+    <span class="t-dot" id="t-dot"></span>
   </button>
-  <button class="tab" onclick="switchTab('settings')" style="position:relative;">
+  <button class="tab" onclick="go('settings')">
     <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-    Settings
+    CONFIG
   </button>
 </div>
 
@@ -238,102 +234,103 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
   <!-- DASHBOARD -->
   <div class="section active" id="tab-dashboard">
     <div class="metrics">
-      <div class="metric"><div class="metric-label">Drugs tracked</div><div class="metric-val ok" id="m-total">0</div></div>
-      <div class="metric"><div class="metric-label">Logs today</div><div class="metric-val" id="m-logs">0</div></div>
-      <div class="metric"><div class="metric-label">Low stock</div><div class="metric-val warn" id="m-low">0</div></div>
-      <div class="metric"><div class="metric-label">Critical</div><div class="metric-val danger" id="m-critical">0</div></div>
+      <div class="metric"><div class="metric-lbl">Drugs tracked</div><div class="metric-val ok" id="m-total">0</div></div>
+      <div class="metric"><div class="metric-lbl">Logs today</div><div class="metric-val" id="m-logs">0</div></div>
+      <div class="metric"><div class="metric-lbl">Low stock</div><div class="metric-val warn" id="m-low">0</div></div>
+      <div class="metric"><div class="metric-lbl">Critical / out</div><div class="metric-val bad" id="m-crit">0</div></div>
     </div>
 
     <div class="card">
-      <div class="card-title">
+      <div class="card-hd">
         <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
         Recent activity
       </div>
-      <div id="recent-log-list"><div class="empty"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>No usage logged yet</div></div>
+      <div id="recent-logs"><div class="empty"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>No usage logged yet</div></div>
     </div>
 
-    <div class="banner" id="sheets-banner">
-      <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-      <div class="banner-text"><strong>Connect to Google Sheets</strong><br/>Logs sync automatically + email alerts fire on low stock</div>
-      <button class="banner-btn" onclick="switchTab('settings')">Set up →</button>
+    <div class="sync-card" id="dash-sync-card">
+      <svg viewBox="0 0 24 24"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>
+      <div><div class="sc-title">Google Sheets sync</div><div class="sc-sub" id="dash-sync-sub">Connect in Settings to enable auto-sync</div></div>
+      <button class="sc-btn" onclick="go('settings')">Set up →</button>
     </div>
   </div>
 
-  <!-- LOG USAGE -->
+  <!-- LOG USE — simplified: drug, qty, notes only -->
   <div class="section" id="tab-log">
     <div class="card">
-      <div class="card-title">
+      <div class="card-hd">
         <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
         Log drug usage
       </div>
-      <div class="form-group">
+      <div class="fg">
         <label>Drug</label>
         <select id="log-drug"><option value="">Select drug...</option></select>
       </div>
-      <div class="form-row">
-        <div>
-          <label>Staff name</label>
-          <input type="text" id="log-staff" placeholder="e.g. S. Brown"/>
-        </div>
-        <div>
-          <label>Quantity used</label>
-          <div class="qty-ctrl" style="margin-top:2px;">
-            <button class="qty-btn" onclick="changeQty(-1)">−</button>
-            <span class="qty-val" id="qty-display">1</span>
-            <button class="qty-btn" onclick="changeQty(1)">+</button>
-          </div>
+      <div class="fg">
+        <label>Quantity used</label>
+        <div class="qty-ctrl">
+          <button class="qty-btn" onclick="changeQty(-1)">−</button>
+          <span class="qty-val" id="qty-disp">1</span>
+          <button class="qty-btn" onclick="changeQty(1)">+</button>
         </div>
       </div>
-      <div class="form-group">
-        <label>Patient / reference</label>
-        <input type="text" id="log-patient" placeholder="e.g. Bed 4 / J. Davis"/>
-      </div>
-      <div class="form-group">
-        <label>Notes (optional)</label>
-        <input type="text" id="log-notes" placeholder="e.g. PRN, post-op"/>
+      <div class="fg">
+        <label>Notes <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--muted);font-size:10px;">(optional)</span></label>
+        <input type="text" id="log-notes" placeholder="e.g. PRN dose, post-op"/>
       </div>
       <button class="btn btn-primary" onclick="logUsage()">
         <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
         Log usage
       </button>
     </div>
+    <div class="pull-hint">
+      <svg viewBox="0 0 24 24"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/></svg>
+      Stock syncs from Google Sheets automatically
+    </div>
   </div>
 
   <!-- STOCK -->
   <div class="section" id="tab-stock">
-    <div class="card">
-      <div class="card-title">
-        <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        Add / update drug
-      </div>
-      <div class="form-group">
-        <label>Drug name</label>
-        <input type="text" id="drug-name" placeholder="e.g. Paracetamol 500mg"/>
-      </div>
-      <div class="form-row">
-        <div>
-          <label>Current stock</label>
-          <input type="number" id="drug-stock" min="0" placeholder="e.g. 20"/>
-        </div>
-        <div>
-          <label>Reorder at</label>
-          <input type="number" id="drug-threshold" min="1" placeholder="e.g. 5"/>
-        </div>
-      </div>
-      <div class="form-group">
-        <label>Max stock (prevents over-ordering)</label>
-        <input type="number" id="drug-max" min="1" placeholder="e.g. 30"/>
-      </div>
-      <button class="btn btn-primary" onclick="addDrug()">
-        <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        Save drug
+    <div style="display:flex; gap:8px; margin-bottom:12px;">
+      <button class="btn btn-dark btn-sm" onclick="syncFromSheets()" style="flex:1;">
+        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>
+        Pull from Sheets
+      </button>
+      <button class="btn btn-ghost btn-sm" onclick="go('stock-add')" style="flex:1;" id="add-drug-btn">
+        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Add drug
       </button>
     </div>
 
+    <!-- Inline add form (hidden by default) -->
+    <div class="card" id="add-form" style="display:none;">
+      <div class="card-hd">
+        <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Add / update drug
+      </div>
+      <div class="fg">
+        <label>Drug name</label>
+        <input type="text" id="drug-name" placeholder="e.g. Paracetamol 500mg"/>
+      </div>
+      <div class="fr">
+        <div><label>Current stock</label><input type="number" id="drug-stock" min="0" placeholder="e.g. 20"/></div>
+        <div><label>Reorder at</label><input type="number" id="drug-thresh" min="1" placeholder="e.g. 5"/></div>
+      </div>
+      <div class="fg">
+        <label>Max stock <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--muted);font-size:10px;">(prevents over-ordering)</span></label>
+        <input type="number" id="drug-max" min="1" placeholder="e.g. 30"/>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-primary" onclick="addDrug()" style="flex:2;">Save drug</button>
+        <button class="btn btn-ghost" onclick="hideAddForm()" style="flex:1;">Cancel</button>
+      </div>
+    </div>
+
     <div class="card">
-      <div class="card-title">
-        <svg viewBox="0 0 24 24"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+      <div class="card-hd">
+        <svg viewBox="0 0 24 24"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
         Current stock levels
+        <span style="margin-left:auto; font-size:10px; color:var(--muted); font-weight:400;" id="last-synced-lbl"></span>
       </div>
       <div id="drug-list"><div class="empty"><svg viewBox="0 0 24 24"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>No drugs added yet</div></div>
     </div>
@@ -342,86 +339,75 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
   <!-- ALERTS -->
   <div class="section" id="tab-alerts">
     <div class="card">
-      <div class="card-title">
+      <div class="card-hd">
         <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
         Active alerts
       </div>
       <div id="alert-list"><div class="empty"><svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>All stock levels healthy</div></div>
     </div>
     <div class="card">
-      <div class="card-title">
-        <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-        Push notification test
-      </div>
-      <button class="btn btn-secondary" onclick="testNotification()" style="margin-bottom:8px;">
+      <div class="card-hd">
         <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/></svg>
-        Send test notification
-      </button>
-      <p style="font-size:12px; color:var(--gray-500); text-align:center;">Tap to verify push notifications are working on this device</p>
+        Test notifications
+      </div>
+      <button class="btn btn-ghost" onclick="testPush()">Send test push notification</button>
     </div>
   </div>
 
   <!-- SETTINGS -->
   <div class="section" id="tab-settings">
-    <div class="section-label">Google Sheets integration</div>
+    <div class="s-label">Google Sheets — bidirectional sync</div>
     <div class="card">
-      <div class="form-group">
+      <div class="fg">
         <label>Apps Script Web App URL</label>
-        <div class="sheet-url-wrap">
-          <input type="url" id="sheets-url" placeholder="https://script.google.com/macros/s/.../exec"/>
-          <button class="btn btn-primary" onclick="saveSheetUrl()" style="width:auto; padding:0 16px; font-size:13px;">Save</button>
+        <div class="url-row">
+          <input type="url" id="cfg-url" placeholder="https://script.google.com/macros/s/.../exec"/>
+          <button class="btn btn-primary btn-sm" onclick="saveUrl()">Save</button>
         </div>
-        <p style="font-size:12px; color:var(--gray-500); margin-top:6px;">Paste your Apps Script deployment URL here. All usage logs will sync to your Google Sheet automatically.</p>
+        <p style="font-size:11px;color:var(--muted);margin-top:6px;line-height:1.6;">Paste your deployment URL. The app will push usage logs to Sheets <em>and</em> pull current stock levels back.</p>
       </div>
-      <div class="setting-row">
-        <div class="setting-info">
-          <div class="setting-label">Auto-sync logs</div>
-          <div class="setting-sub">Send each entry to Google Sheets on log</div>
-        </div>
-        <label class="toggle"><input type="checkbox" id="toggle-sync" checked/><span class="toggle-slider"></span></label>
+      <div class="s-row">
+        <div><div class="s-info-label">Auto-push logs to Sheets</div><div class="s-info-sub">Sync each usage entry on submit</div></div>
+        <label class="toggle"><input type="checkbox" id="tog-push-log" checked/><span class="tslider"></span></label>
       </div>
+      <div class="s-row">
+        <div><div class="s-info-label">Auto-pull stock from Sheets</div><div class="s-info-sub">Refresh stock levels every 5 minutes</div></div>
+        <label class="toggle"><input type="checkbox" id="tog-pull" checked/><span class="tslider"></span></label>
+      </div>
+      <button class="btn btn-dark" onclick="syncFromSheets()" style="margin-top:4px;">
+        <svg viewBox="0 0 24 24"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>
+        Pull stock from Sheets now
+      </button>
     </div>
 
-    <div class="section-label">Notifications</div>
+    <div class="s-label">Notifications</div>
     <div class="card">
-      <div class="form-group">
-        <label>Alert email address</label>
-        <input type="email" id="alert-email" placeholder="ot-lead@hospital.com"/>
+      <div class="fg">
+        <label>Alert email</label>
+        <input type="email" id="cfg-email" placeholder="ot-lead@hospital.com"/>
       </div>
-      <div class="setting-row">
-        <div class="setting-info">
-          <div class="setting-label">Push notifications</div>
-          <div class="setting-sub">Browser alerts when stock is critical</div>
-        </div>
-        <label class="toggle"><input type="checkbox" id="toggle-push" onchange="togglePush(this)"/><span class="toggle-slider"></span></label>
+      <div class="s-row">
+        <div><div class="s-info-label">Push notifications</div><div class="s-info-sub">Browser/phone alerts on low stock</div></div>
+        <label class="toggle"><input type="checkbox" id="tog-notif" onchange="toggleNotif(this)"/><span class="tslider"></span></label>
       </div>
-      <div class="setting-row">
-        <div class="setting-info">
-          <div class="setting-label">Email on low stock</div>
-          <div class="setting-sub">Fire email when threshold is reached</div>
-        </div>
-        <label class="toggle"><input type="checkbox" id="toggle-email" checked/><span class="toggle-slider"></span></label>
+      <div class="s-row">
+        <div><div class="s-info-label">Email on low stock</div><div class="s-info-sub">Via Apps Script trigger</div></div>
+        <label class="toggle"><input type="checkbox" id="tog-email" checked/><span class="tslider"></span></label>
       </div>
-      <div class="setting-row">
-        <div class="setting-info">
-          <div class="setting-label">Daily summary email</div>
-          <div class="setting-sub">Morning stock report via Apps Script trigger</div>
-        </div>
-        <label class="toggle"><input type="checkbox" id="toggle-daily" checked/><span class="toggle-slider"></span></label>
+      <div class="s-row" style="border:none;">
+        <div><div class="s-info-label">Daily summary email</div><div class="s-info-sub">Morning stock report (set trigger in Apps Script)</div></div>
+        <label class="toggle"><input type="checkbox" id="tog-daily" checked/><span class="tslider"></span></label>
       </div>
-      <button class="btn btn-primary" onclick="saveSettings()" style="margin-top:4px;">
+      <button class="btn btn-primary" onclick="saveSettings()">
         <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
         Save settings
       </button>
     </div>
 
-    <div class="section-label">About</div>
-    <div class="card">
-      <div class="setting-row" style="padding:8px 0;">
-        <div class="setting-label">OT Drug Chart</div>
-        <span class="badge badge-info">v1.0 PWA</span>
-      </div>
-      <p style="font-size:12px; color:var(--gray-500); line-height:1.6;">Built for OT department drug management. Works offline. Install to home screen for full app experience. Data stored locally on device + syncs to Google Sheets when connected.</p>
+    <div class="s-label">About</div>
+    <div class="card" style="display:flex;align-items:center;justify-content:space-between;">
+      <span style="font-family:var(--font-head);font-size:13px;font-weight:600;">OT Drug Chart</span>
+      <span class="badge b-blue">v2.0 PWA</span>
     </div>
   </div>
 
@@ -430,270 +416,300 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
 <div class="toast" id="toast"></div>
 
 <script>
-// ── STATE ──────────────────────────────────────────────────────────
-let drugs = JSON.parse(localStorage.getItem('ot_drugs') || 'null') || [
-  { name: 'Paracetamol 500mg', stock: 18, threshold: 5, max: 30 },
-  { name: 'Ibuprofen 400mg',   stock: 4,  threshold: 5, max: 25 },
-  { name: 'Morphine 10mg/ml',  stock: 2,  threshold: 4, max: 10 },
-  { name: 'Metoclopramide',    stock: 12, threshold: 4, max: 20 },
+// ── STATE ──────────────────────────────────────────────
+let drugs    = JSON.parse(localStorage.getItem('ot_drugs')    || 'null') || [
+  { name:'Paracetamol 500mg', stock:18, threshold:5,  max:30 },
+  { name:'Ibuprofen 400mg',   stock:4,  threshold:5,  max:25 },
+  { name:'Morphine 10mg/ml',  stock:2,  threshold:4,  max:10 },
+  { name:'Metoclopramide',    stock:12, threshold:4,  max:20 },
 ];
-let logs = JSON.parse(localStorage.getItem('ot_logs') || '[]');
+let logs     = JSON.parse(localStorage.getItem('ot_logs')     || '[]');
 let settings = JSON.parse(localStorage.getItem('ot_settings') || '{}');
-let qty = 1;
+let qty      = 1;
+let lastSync = localStorage.getItem('ot_last_sync') || null;
 
-function save() {
+function persist() {
   localStorage.setItem('ot_drugs', JSON.stringify(drugs));
-  localStorage.setItem('ot_logs', JSON.stringify(logs));
+  localStorage.setItem('ot_logs',  JSON.stringify(logs));
   localStorage.setItem('ot_settings', JSON.stringify(settings));
 }
 
-// ── TABS ──────────────────────────────────────────────────────────
+// ── TABS ──────────────────────────────────────────────
 const TABS = ['dashboard','log','stock','alerts','settings'];
-function switchTab(t) {
-  TABS.forEach(id => {
-    document.getElementById('tab-'+id).classList.remove('active');
-  });
-  document.querySelectorAll('.tab').forEach((el,i) => {
-    el.classList.toggle('active', TABS[i] === t);
-  });
+function go(t) {
+  if (t === 'stock-add') { go('stock'); showAddForm(); return; }
+  TABS.forEach(id => document.getElementById('tab-'+id).classList.remove('active'));
+  document.querySelectorAll('.tab').forEach((el,i) => el.classList.toggle('active', TABS[i]===t));
   document.getElementById('tab-'+t).classList.add('active');
   render();
 }
 
-// ── DATE ──────────────────────────────────────────────────────────
-document.getElementById('header-date').textContent =
-  new Date().toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long' });
-
-// ── TOAST ──────────────────────────────────────────────────────────
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2400);
+// ── TOAST ──────────────────────────────────────────────
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(()=> el.classList.remove('show'), 2500);
 }
 
-// ── STATUS ──────────────────────────────────────────────────────────
-function getStatus(d) {
-  if (d.stock === 0) return 'out';
-  if (d.stock <= d.threshold) return 'low';
-  return 'ok';
-}
+// ── HELPERS ──────────────────────────────────────────────
+function status(d) { return d.stock===0?'out': d.stock<=d.threshold?'low':'ok'; }
 
-// ── RENDER ──────────────────────────────────────────────────────────
+function showAddForm()  { document.getElementById('add-form').style.display='block'; document.getElementById('add-drug-btn').style.display='none'; }
+function hideAddForm()  { document.getElementById('add-form').style.display='none';  document.getElementById('add-drug-btn').style.display=''; }
+
+// ── RENDER ──────────────────────────────────────────────
 function render() {
   const today = new Date().toDateString();
-  const logsToday = logs.filter(l => new Date(l.ts).toDateString() === today);
-  const alerts = drugs.filter(d => getStatus(d) !== 'ok');
-  const lowCount = drugs.filter(d => getStatus(d) === 'low').length;
-  const critCount = drugs.filter(d => getStatus(d) === 'out').length;
+  const todayLogs = logs.filter(l => new Date(l.ts).toDateString()===today);
+  const alerts = drugs.filter(d => status(d)!=='ok');
+  const lowN   = drugs.filter(d => status(d)==='low').length;
+  const critN  = drugs.filter(d => status(d)==='out').length;
 
   document.getElementById('m-total').textContent = drugs.length;
-  document.getElementById('m-logs').textContent = logsToday.length;
-  document.getElementById('m-low').textContent = lowCount;
-  document.getElementById('m-critical').textContent = critCount;
+  document.getElementById('m-logs').textContent  = todayLogs.length;
+  document.getElementById('m-low').textContent   = lowN;
+  document.getElementById('m-crit').textContent  = critN;
 
-  const alertCount = alerts.length;
-  const dot = document.getElementById('tab-alert-dot');
-  const hbadge = document.getElementById('header-alert-badge');
-  if (alertCount > 0) {
-    dot.style.display = 'block';
-    dot.textContent = alertCount;
-    hbadge.style.display = 'flex';
-    hbadge.classList.add('alert');
-    document.getElementById('header-alert-count').textContent = alertCount;
+  // Header alert pill
+  const pill = document.getElementById('hdr-pill');
+  if (alerts.length) { pill.style.display='flex'; document.getElementById('hdr-pill-n').textContent=alerts.length; }
+  else pill.style.display='none';
+
+  // Tab dot
+  const dot = document.getElementById('t-dot');
+  if (alerts.length) { dot.style.display='block'; dot.textContent=alerts.length; }
+  else dot.style.display='none';
+
+  // Sync bar
+  const sd = document.getElementById('sync-dot');
+  const st = document.getElementById('sync-status-txt');
+  const snb = document.getElementById('sync-now-btn');
+  if (!settings.sheetUrl) {
+    sd.className='sync-dot'; st.textContent='Not connected to Sheets'; snb.style.display='none';
   } else {
-    dot.style.display = 'none';
-    hbadge.style.display = 'none';
+    sd.className='sync-dot ok';
+    st.textContent = lastSync ? 'Synced '+new Date(lastSync).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}) : 'Connected · not synced yet';
+    snb.style.display='block';
   }
 
   // Recent logs
-  const rl = document.getElementById('recent-log-list');
-  if (!logs.length) {
-    rl.innerHTML = '<div class="empty"><svg viewBox="0 0 24 24" width="32" height="32" stroke="#d1d5db" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>No usage logged yet</div>';
-  } else {
-    rl.innerHTML = logs.slice(-6).reverse().map(l => `
+  const rl = document.getElementById('recent-logs');
+  rl.innerHTML = !logs.length
+    ? '<div class="empty"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>No usage logged yet</div>'
+    : logs.slice(-6).reverse().map(l=>`
       <div class="log-item">
-        <div class="log-top">
-          <span class="log-drug">${l.drug}</span>
-          <span class="log-qty">−${l.qty} unit${l.qty>1?'s':''}</span>
-        </div>
-        <div class="log-meta">${l.staff}${l.patient ? ' · '+l.patient : ''} · ${new Date(l.ts).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})}</div>
+        <div class="log-top"><span class="log-name">${l.drug}</span><span class="log-qty">−${l.qty}</span></div>
+        <div class="log-meta">${new Date(l.ts).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})}${l.notes?' · '+l.notes:''}</div>
       </div>`).join('');
-  }
-
-  // Drug list
-  const dl = document.getElementById('drug-list');
-  if (!drugs.length) {
-    dl.innerHTML = '<div class="empty"><svg viewBox="0 0 24 24" width="32" height="32" stroke="#d1d5db" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>No drugs added yet</div>';
-  } else {
-    dl.innerHTML = drugs.map((d,i) => {
-      const pct = Math.min(100, Math.round((d.stock / d.max) * 100));
-      const s = getStatus(d);
-      const barColor = s==='ok' ? '#1a6b52' : s==='low' ? '#d97706' : '#dc2626';
-      const badge = s==='ok'
-        ? '<span class="badge badge-ok">OK</span>'
-        : s==='low'
-        ? '<span class="badge badge-warn">Low</span>'
-        : '<span class="badge badge-danger">Out</span>';
-      return `<div class="drug-item">
-        <div class="drug-info">
-          <div class="drug-name">${d.name}</div>
-          <div class="drug-meta">${d.stock} / ${d.max} units · reorder at ${d.threshold}</div>
-        </div>
-        <div class="stock-bar-wrap"><div class="stock-bar" style="width:${pct}%;background:${barColor};"></div></div>
-        ${badge}
-        <button class="del-btn" onclick="removeDrug(${i})" aria-label="Remove">✕</button>
-      </div>`;
-    }).join('');
-  }
 
   // Drug select
   const sel = document.getElementById('log-drug');
   const prev = sel.value;
-  sel.innerHTML = '<option value="">Select drug...</option>' + drugs.map(d =>
+  sel.innerHTML = '<option value="">Select drug...</option>' + drugs.map(d=>
     `<option value="${d.name}" ${d.name===prev?'selected':''}>${d.name} (${d.stock} left)</option>`
   ).join('');
 
+  // Drug list
+  const dl = document.getElementById('drug-list');
+  dl.innerHTML = !drugs.length
+    ? '<div class="empty"><svg viewBox="0 0 24 24"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>No drugs added</div>'
+    : drugs.map((d,i)=>{
+      const pct = Math.min(100, Math.round(d.stock/d.max*100));
+      const s   = status(d);
+      const col = s==='ok'?'#00b894':s==='low'?'#f59e0b':'#ef4444';
+      const bdg = s==='ok'?'<span class="badge b-ok">OK</span>':s==='low'?'<span class="badge b-warn">LOW</span>':'<span class="badge b-bad">OUT</span>';
+      return `<div class="drug-item">
+        <div class="di-info">
+          <div class="di-name">${d.name}</div>
+          <div class="di-meta">${d.stock} / ${d.max} · reorder at ${d.threshold}</div>
+        </div>
+        <div class="bar-wrap"><div class="bar-fill" style="width:${pct}%;background:${col};"></div></div>
+        ${bdg}
+        <button class="del-btn" onclick="removeDrug(${i})">✕</button>
+      </div>`;
+    }).join('');
+
+  // Last synced label
+  const lsl = document.getElementById('last-synced-lbl');
+  lsl.textContent = lastSync ? 'Synced '+new Date(lastSync).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}) : '';
+
   // Alert list
   const al = document.getElementById('alert-list');
-  if (!alerts.length) {
-    al.innerHTML = '<div class="empty"><svg viewBox="0 0 24 24" width="32" height="32" stroke="#d1d5db" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>All stock levels healthy</div>';
-  } else {
-    al.innerHTML = alerts.map(d => {
-      const s = getStatus(d);
-      const icon = s==='out'
-        ? `<div class="alert-icon danger"><svg viewBox="0 0 24 24"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>`
-        : `<div class="alert-icon warn"><svg viewBox="0 0 24 24"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>`;
-      const msg = s==='out'
-        ? `<b>${d.name}</b> is out of stock — order immediately`
-        : `<b>${d.name}</b> is low — ${d.stock} unit${d.stock!==1?'s':''} remaining`;
-      return `<div class="alert-item">${icon}<div><div class="alert-text">${msg}</div><div class="alert-sub">Reorder threshold: ${d.threshold} units · Email alert queued</div></div></div>`;
+  al.innerHTML = !alerts.length
+    ? '<div class="empty"><svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>All stock levels healthy</div>'
+    : alerts.map(d=>{
+      const s = status(d);
+      const ico = s==='out'
+        ? `<div class="alert-ico bad"><svg viewBox="0 0 24 24"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>`
+        : `<div class="alert-ico warn"><svg viewBox="0 0 24 24"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>`;
+      const msg = s==='out' ? `<b>${d.name}</b> — out of stock, order immediately` : `<b>${d.name}</b> — ${d.stock} unit${d.stock!==1?'s':''} remaining`;
+      return `<div class="alert-item">${ico}<div><div class="alert-txt">${msg}</div><div class="alert-sub">Reorder threshold: ${d.threshold} units</div></div></div>`;
     }).join('');
-  }
 
-  // Settings
-  const su = document.getElementById('sheets-url');
-  if (settings.sheetUrl) su.value = settings.sheetUrl;
-  const ae = document.getElementById('alert-email');
-  if (settings.alertEmail) ae.value = settings.alertEmail;
-  if (settings.pushEnabled) document.getElementById('toggle-push').checked = true;
+  // Dashboard sync card
+  const dsc = document.getElementById('dash-sync-sub');
+  dsc.textContent = settings.sheetUrl ? (lastSync ? 'Last synced '+new Date(lastSync).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}) : 'Connected — tap to sync') : 'Connect in Settings to enable auto-sync';
+  document.querySelector('#dash-sync-card .sc-btn').textContent = settings.sheetUrl ? 'Sync now →' : 'Set up →';
+  document.querySelector('#dash-sync-card .sc-btn').onclick = settings.sheetUrl ? syncFromSheets : ()=>go('settings');
+
+  // Settings fields
+  if (settings.sheetUrl) document.getElementById('cfg-url').value = settings.sheetUrl;
+  if (settings.alertEmail) document.getElementById('cfg-email').value = settings.alertEmail;
+  if (settings.pushEnabled) document.getElementById('tog-notif').checked = true;
 }
 
-// ── ACTIONS ──────────────────────────────────────────────────────────
-function changeQty(d) { qty = Math.max(1, qty+d); document.getElementById('qty-display').textContent = qty; }
+// ── LOG USAGE ──────────────────────────────────────────────
+function changeQty(d) { qty=Math.max(1,qty+d); document.getElementById('qty-disp').textContent=qty; }
 
+function logUsage() {
+  const drug  = document.getElementById('log-drug').value;
+  const notes = document.getElementById('log-notes').value.trim();
+  if (!drug) { toast('Please select a drug'); return; }
+  const idx = drugs.findIndex(d=>d.name===drug);
+  if (idx<0) return;
+  if (drugs[idx].stock < qty) { toast('Not enough stock'); return; }
+  drugs[idx].stock -= qty;
+  const entry = { drug, qty, notes, ts: new Date().toISOString() };
+  logs.push(entry);
+  persist();
+  document.getElementById('log-drug').value='';
+  document.getElementById('log-notes').value='';
+  qty=1; document.getElementById('qty-disp').textContent=1;
+  render();
+  toast('Usage logged ✓');
+  const d = drugs[idx];
+  if (status(d)!=='ok') {
+    if (settings.pushEnabled) push(`Low stock: ${d.name}`, `${d.stock} unit${d.stock!==1?'s':''} remaining — reorder needed.`);
+  }
+  if (settings.sheetUrl && document.getElementById('tog-push-log').checked) {
+    sendToSheets({ type:'log', drug, qty, notes, stock: d.stock, threshold: d.threshold, ts: entry.ts });
+    sendToSheets({ type:'stock', drug, stock: d.stock, threshold: d.threshold, max: d.max });
+  }
+}
+
+// ── DRUG MANAGEMENT ──────────────────────────────────────────────
 function addDrug() {
-  const name = document.getElementById('drug-name').value.trim();
+  const name  = document.getElementById('drug-name').value.trim();
   const stock = parseInt(document.getElementById('drug-stock').value);
-  const threshold = parseInt(document.getElementById('drug-threshold').value);
-  const max = parseInt(document.getElementById('drug-max').value);
-  if (!name || isNaN(stock) || isNaN(threshold) || isNaN(max)) { showToast('Please fill all fields'); return; }
-  const idx = drugs.findIndex(d => d.name.toLowerCase()===name.toLowerCase());
-  if (idx>=0) drugs[idx] = {name,stock,threshold,max};
-  else drugs.push({name,stock,threshold,max});
-  ['drug-name','drug-stock','drug-threshold','drug-max'].forEach(id => document.getElementById(id).value='');
-  save(); render(); showToast('Drug saved ✓');
-  if (settings.sheetUrl) syncToSheets({type:'stock', drug:name, stock, threshold, max});
+  const thr   = parseInt(document.getElementById('drug-thresh').value);
+  const max   = parseInt(document.getElementById('drug-max').value);
+  if (!name||isNaN(stock)||isNaN(thr)||isNaN(max)) { toast('Fill in all fields'); return; }
+  const idx = drugs.findIndex(d=>d.name.toLowerCase()===name.toLowerCase());
+  if (idx>=0) drugs[idx]={name,stock,threshold:thr,max};
+  else drugs.push({name,stock,threshold:thr,max});
+  ['drug-name','drug-stock','drug-thresh','drug-max'].forEach(id=>document.getElementById(id).value='');
+  hideAddForm();
+  persist(); render(); toast('Drug saved ✓');
+  if (settings.sheetUrl) sendToSheets({type:'stock',drug:name,stock,threshold:thr,max});
 }
 
 function removeDrug(i) {
   if (!confirm('Remove '+drugs[i].name+'?')) return;
-  drugs.splice(i,1); save(); render();
+  drugs.splice(i,1); persist(); render();
 }
 
-function logUsage() {
-  const drug = document.getElementById('log-drug').value;
-  const staff = document.getElementById('log-staff').value.trim();
-  const patient = document.getElementById('log-patient').value.trim();
-  const notes = document.getElementById('log-notes').value.trim();
-  if (!drug || !staff) { showToast('Select drug and enter staff name'); return; }
-  const idx = drugs.findIndex(d => d.name===drug);
-  if (idx<0) return;
-  if (drugs[idx].stock < qty) { showToast('Not enough stock'); return; }
-  drugs[idx].stock -= qty;
-  const entry = { drug, qty, staff, patient, notes, ts: new Date().toISOString() };
-  logs.push(entry);
-  save();
-  ['log-staff','log-patient','log-notes'].forEach(id => document.getElementById(id).value='');
-  document.getElementById('log-drug').value = '';
-  qty=1; document.getElementById('qty-display').textContent=1;
-  render();
-  showToast('Usage logged ✓');
-  const d = drugs[idx];
-  if (getStatus(d) !== 'ok') {
-    fireAlert(d);
-    if (settings.pushEnabled) pushNotify(`Low stock: ${d.name}`, `Only ${d.stock} unit${d.stock!==1?'s':''} remaining — reorder needed.`);
-  }
-  if (settings.sheetUrl && document.getElementById('toggle-sync').checked) {
-    syncToSheets({type:'log', drug, qty, staff, patient, notes, stock: d.stock, threshold: d.threshold});
-    syncToSheets({type:'stock', drug, stock: d.stock, threshold: d.threshold, max: d.max});
-  }
-}
-
-// ── GOOGLE SHEETS SYNC ──────────────────────────────────────────────
-async function syncToSheets(data) {
+// ── GOOGLE SHEETS — PUSH ──────────────────────────────────────────────
+async function sendToSheets(data) {
   if (!settings.sheetUrl) return;
   try {
     await fetch(settings.sheetUrl, {
-      method: 'POST',
-      body: JSON.stringify(data),
-      headers: { 'Content-Type': 'application/json' },
-      mode: 'no-cors'
+      method:'POST', body:JSON.stringify(data),
+      headers:{'Content-Type':'application/json'}, mode:'no-cors'
     });
-  } catch(e) { console.warn('Sheets sync failed:', e); }
+  } catch(e){ console.warn('Push failed:',e); }
 }
+
+// ── GOOGLE SHEETS — PULL STOCK ──────────────────────────────────────────────
+async function syncFromSheets() {
+  if (!settings.sheetUrl) { toast('No Sheets URL — check Settings'); return; }
+  const sd = document.getElementById('sync-dot');
+  sd.className='sync-dot spin';
+  document.getElementById('sync-status-txt').textContent='Syncing...';
+  try {
+    // GET request — Apps Script doGet returns current stock as JSON
+    const res = await fetch(settings.sheetUrl + '?action=getStock', { method:'GET', mode:'cors' });
+    if (!res.ok) throw new Error('HTTP '+res.status);
+    const data = await res.json();
+    // data expected: [ { name, stock, threshold, max }, ... ]
+    if (Array.isArray(data) && data.length) {
+      data.forEach(row => {
+        if (!row.name) return;
+        const idx = drugs.findIndex(d=>d.name.toLowerCase()===row.name.toLowerCase());
+        const updated = {
+          name: row.name,
+          stock: parseInt(row.stock)||0,
+          threshold: parseInt(row.threshold)||5,
+          max: parseInt(row.max)||30
+        };
+        if (idx>=0) drugs[idx]=updated;
+        else drugs.push(updated);
+      });
+      persist();
+      lastSync = new Date().toISOString();
+      localStorage.setItem('ot_last_sync', lastSync);
+      render();
+      toast(`Stock synced — ${data.length} drug${data.length!==1?'s':''} updated ✓`);
+      // Check for new alerts after sync
+      drugs.forEach(d=>{ if(status(d)!=='ok' && settings.pushEnabled) push(`Low stock: ${d.name}`,`${d.stock} units remaining`); });
+    } else {
+      toast('No stock data received from Sheets');
+    }
+    sd.className='sync-dot ok';
+  } catch(err) {
+    sd.className='sync-dot err';
+    document.getElementById('sync-status-txt').textContent='Sync failed — check URL';
+    toast('Sync failed: '+err.message);
+    console.error(err);
+  }
+}
+
+// Auto-pull every 5 minutes if enabled
+setInterval(()=>{
+  if (settings.sheetUrl && document.getElementById('tog-pull') && document.getElementById('tog-pull').checked) {
+    syncFromSheets();
+  }
+}, 5 * 60 * 1000);
 
 // ── PUSH NOTIFICATIONS ──────────────────────────────────────────────
-async function togglePush(el) {
-  if (!el.checked) { settings.pushEnabled = false; save(); return; }
-  if (!('Notification' in window)) { showToast('Notifications not supported'); el.checked=false; return; }
-  const perm = await Notification.requestPermission();
-  if (perm === 'granted') {
-    settings.pushEnabled = true; save();
-    showToast('Push notifications enabled ✓');
-  } else {
-    el.checked = false;
-    showToast('Permission denied — check browser settings');
+async function toggleNotif(el) {
+  if (!el.checked) { settings.pushEnabled=false; persist(); return; }
+  if (!('Notification' in window)) { toast('Notifications not supported on this device'); el.checked=false; return; }
+  const p = await Notification.requestPermission();
+  if (p==='granted') { settings.pushEnabled=true; persist(); toast('Push notifications enabled ✓'); }
+  else { el.checked=false; toast('Permission denied — check browser settings'); }
+}
+
+function push(title, body) {
+  if (Notification.permission==='granted') {
+    new Notification(title, { body, icon:'icons/icon-192.png', tag:'ot-alert' });
   }
 }
 
-function pushNotify(title, body) {
-  if (Notification.permission === 'granted') {
-    new Notification(title, { body, icon: 'icons/icon-192.png', badge: 'icons/icon-192.png', tag: 'ot-drug-alert' });
-  }
+function testPush() {
+  if (Notification.permission!=='granted') { toast('Enable notifications in Settings first'); return; }
+  push('OT Drug Chart — Test', 'Push notifications are working on this device ✓');
+  toast('Test notification sent ✓');
 }
 
-function testNotification() {
-  if (Notification.permission !== 'granted') {
-    showToast('Enable push notifications in Settings first');
-    return;
-  }
-  pushNotify('OT Drug Chart — Test', 'Push notifications are working correctly on this device.');
-  showToast('Test notification sent ✓');
-}
-
-function fireAlert(d) {
-  showToast(`⚠ Alert: ${d.name} is ${d.stock===0?'out of stock':'low'}`);
-}
-
-// ── SETTINGS SAVE ──────────────────────────────────────────────────
-function saveSheetUrl() {
-  settings.sheetUrl = document.getElementById('sheets-url').value.trim();
-  save(); showToast('Sheet URL saved ✓');
-  if (settings.sheetUrl) document.getElementById('sheets-banner').style.display='none';
+// ── SETTINGS ──────────────────────────────────────────────
+function saveUrl() {
+  settings.sheetUrl = document.getElementById('cfg-url').value.trim();
+  persist(); render(); toast('Sheet URL saved ✓');
 }
 function saveSettings() {
-  settings.sheetUrl = document.getElementById('sheets-url').value.trim();
-  settings.alertEmail = document.getElementById('alert-email').value.trim();
-  save(); showToast('Settings saved ✓');
-  if (settings.sheetUrl) document.getElementById('sheets-banner').style.display='none';
+  settings.sheetUrl    = document.getElementById('cfg-url').value.trim();
+  settings.alertEmail  = document.getElementById('cfg-email').value.trim();
+  persist(); render(); toast('Settings saved ✓');
 }
 
-// ── SERVICE WORKER ──────────────────────────────────────────────────
+// ── SERVICE WORKER ──────────────────────────────────────────────
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js').catch(e => console.warn('SW:', e));
+  navigator.serviceWorker.register('sw.js').catch(e=>console.warn('SW:',e));
 }
 
+// ── INIT ──────────────────────────────────────────────
+document.getElementById('hdr-date').textContent = new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
 render();
 </script>
 </body>
