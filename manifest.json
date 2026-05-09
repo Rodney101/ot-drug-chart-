@@ -1,39 +1,38 @@
 {
   "name": "OT Drug Chart",
   "short_name": "OT Drugs",
-  "description": "OT Department Drug Chart — bidirectional Google Sheets sync",
-  "start_url": "./index.html",
-  "scope": "./",
+  "description": "OT Department Drug Chart",
+  "start_url": "/ot-drug-chart-/index.html",
+  "scope": "/ot-drug-chart-/",
   "display": "standalone",
   "background_color": "#1a1a2e",
   "theme_color": "#1a1a2e",
   "orientation": "portrait-primary",
+  "prefer_related_applications": false,
   "icons": [
     {
-      "src": "icons/icon-192.png",
+      "src": "/ot-drug-chart-/icons/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "icons/icon-192.png",
+      "src": "/ot-drug-chart-/icons/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "maskable"
     },
     {
-      "src": "icons/icon-512.png",
+      "src": "/ot-drug-chart-/icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "icons/icon-512.png",
+      "src": "/ot-drug-chart-/icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
     }
-  ],
-  "categories": ["medical", "productivity"],
-  "lang": "en-GB"
+  ]
 }
