@@ -7,8 +7,10 @@
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="apple-mobile-web-app-title" content="OT Drugs"/>
-<link rel="manifest" href="manifest.json"/>
-<link rel="apple-touch-icon" href="icons/icon-192.png"/>
+<link rel="manifest" href="./manifest.json"/>
+<link rel="apple-touch-icon" href="./icons/icon-192.png"/>
+<meta name="apple-mobile-web-app-title" content="OT Drugs"/>
+<meta name="mobile-web-app-capable" content="yes"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
@@ -861,12 +863,13 @@ function sendSummaryNow() {
 
 function saveUrl() {
   settings.sheetUrl = document.getElementById('cfg-url').value.trim();
-  persist(); render(); toast('Sheet URL saved ✓');
+  persist(); render();
+  if (settings.sheetUrl) toast('Sheet URL saved ✓');
 }
-function saveSettings() {
-  settings.sheetUrl    = document.getElementById('cfg-url').value.trim();
-  settings.alertEmail  = document.getElementById('cfg-email').value.trim();
-  persist(); render(); toast('Settings saved ✓');
+function saveEmail() {
+  settings.alertEmail = document.getElementById('cfg-email').value.trim();
+  persist();
+  if (settings.alertEmail) toast('Email saved ✓');
 }
 
 // ── SERVICE WORKER ──────────────────────────────────────────────
