@@ -180,6 +180,14 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
 /* PULL TO SYNC hint */
 .pull-hint { text-align: center; font-size: 11px; color: var(--muted); padding: 8px 0 0; font-family: var(--font-head); display: flex; align-items: center; justify-content: center; gap: 5px; }
 .pull-hint svg { width: 13px; height: 13px; stroke: var(--muted); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+/* AUTOCOMPLETE */
+.ac-wrap { position: relative; }
+.ac-list { position: absolute; top: calc(100% + 4px); left: 0; right: 0; background: var(--white); border: 1.5px solid var(--teal); border-radius: var(--r-sm); box-shadow: 0 8px 24px rgba(0,0,0,0.12); z-index: 100; overflow: hidden; display: none; }
+.ac-list.open { display: block; }
+.ac-item { padding: 11px 14px; font-size: 14px; font-family: var(--font-body); color: var(--ink); cursor: pointer; border-bottom: 1px solid var(--surface); display: flex; align-items: center; justify-content: space-between; }
+.ac-item:last-child { border-bottom: none; }
+.ac-item:hover, .ac-item.active { background: var(--teal-l); }
+.ac-item-stock { font-size: 11px; color: var(--muted); font-family: var(--font-head); }
 </style>
 </head>
 <body>
@@ -308,7 +316,10 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
       </div>
       <div class="fg">
         <label>Drug name</label>
-        <input type="text" id="drug-name" placeholder="e.g. Paracetamol 500mg"/>
+        <div class="ac-wrap">
+          <input type="text" id="drug-name" placeholder="Enter drug name" autocomplete="off" oninput="acUpdate()" onkeydown="acKey(event)" onfocus="acUpdate()"/>
+          <div class="ac-list" id="ac-list"></div>
+        </div>
       </div>
       <div class="fr">
         <div><label>Current stock</label><input type="number" id="drug-stock" min="0" placeholder="e.g. 20"/></div>
@@ -575,6 +586,44 @@ function logUsage() {
   }
 }
 
+// ── AUTOCOMPLETE ──────────────────────────────────────────────
+let acIdx = -1;
+function acUpdate() {
+  const val = document.getElementById("drug-name").value.trim().toLowerCase();
+  const list = document.getElementById("ac-list");
+  acIdx = -1;
+  if (!val) { list.classList.remove("open"); list.innerHTML=""; return; }
+  const matches = drugs.filter(d => d.name.toLowerCase().includes(val));
+  if (!matches.length) { list.classList.remove("open"); list.innerHTML=""; return; }
+  list.innerHTML = matches.map((d,i) =>
+    `<div class="ac-item" onmousedown="acSelect(${JSON.stringify(d.name)})">
+      <span>${d.name}</span>
+      <span class="ac-item-stock">${d.stock} units</span>
+    </div>`
+  ).join("");
+  list.classList.add("open");
+}
+function acSelect(name) {
+  document.getElementById("drug-name").value = name;
+  document.getElementById("ac-list").classList.remove("open");
+  // Auto-fill stock and threshold from existing drug
+  const d = drugs.find(x => x.name === name);
+  if (d) {
+    document.getElementById("drug-stock").value = d.stock;
+    document.getElementById("drug-thresh").value = d.threshold;
+  }
+}
+function acKey(e) {
+  const list = document.getElementById("ac-list");
+  const items = list.querySelectorAll(".ac-item");
+  if (!items.length) return;
+  if (e.key === "ArrowDown") { e.preventDefault(); acIdx = Math.min(acIdx+1, items.length-1); items.forEach((el,i)=>el.classList.toggle("active",i===acIdx)); }
+  else if (e.key === "ArrowUp") { e.preventDefault(); acIdx = Math.max(acIdx-1, 0); items.forEach((el,i)=>el.classList.toggle("active",i===acIdx)); }
+  else if (e.key === "Enter" && acIdx >= 0) { e.preventDefault(); acSelect(drugs.filter(d=>d.name.toLowerCase().includes(document.getElementById("drug-name").value.trim().toLowerCase()))[acIdx].name); }
+  else if (e.key === "Escape") { list.classList.remove("open"); }
+}
+document.addEventListener("click", e => { if (!e.target.closest(".ac-wrap")) document.getElementById("ac-list").classList.remove("open"); });
+
 // ── DRUG MANAGEMENT ──────────────────────────────────────────────
 function addDrug() {
   const name  = document.getElementById('drug-name').value.trim();
@@ -585,6 +634,7 @@ function addDrug() {
   if (idx>=0) drugs[idx]={name,stock,threshold:thr};
   else drugs.push({name,stock,threshold:thr});
   ['drug-name','drug-stock','drug-thresh'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('ac-list').classList.remove('open');
   hideAddForm();
   persist(); render(); toast('Drug saved ✓');
   if (settings.sheetUrl) sendToSheets({type:'stock',drug:name,stock,threshold:thr});
