@@ -806,9 +806,24 @@ if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('sw.js').catch(e=>console.warn('SW:',e));
 }
 
-// ── INIT ──────────────────────────────────────────────
-document.getElementById('hdr-date').textContent = new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
+// ── INIT ──────────────────────────────────────
+(function() {
+  const _days   = ['Sun.','Mon.','Tue.','Wed.','Thu.','Fri.','Sat.'];
+  const _months = ['Jan.','Feb.','Mar.','Apr.','May','Jun.','Jul.','Aug.','Sep.','Oct.','Nov.','Dec.'];
+  const _now = new Date();
+  document.getElementById('hdr-date').textContent =
+    _days[_now.getDay()] + ' ' + _months[_now.getMonth()] + ' ' + _now.getDate() + ', ' + _now.getFullYear();
+})();
 render();
+
+// Auto-sync from Google Sheets on every page load/refresh
+// This keeps localStorage up to date with the sheet as the source of truth
+if (settings.sheetUrl) {
+  // Small delay so the UI renders first, then syncs in background
+  setTimeout(() => {
+    syncFromSheets().catch(() => {});
+  }, 800);
+}
 </script>
 </body>
 </html>
