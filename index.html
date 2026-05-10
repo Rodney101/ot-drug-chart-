@@ -183,9 +183,9 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
 .pull-hint svg { width: 13px; height: 13px; stroke: var(--muted); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 /* AUTOCOMPLETE */
 .ac-wrap { position: relative; }
-.ac-list { position: absolute; top: calc(100% + 4px); left: 0; right: 0; background: var(--white); border: 1.5px solid var(--teal); border-radius: var(--r-sm); box-shadow: 0 8px 24px rgba(0,0,0,0.12); z-index: 100; overflow: hidden; display: none; }
+.ac-list { position: absolute; top: calc(100% + 4px); left: 0; right: 0; background: var(--white); border: 1.5px solid var(--teal); border-radius: var(--r-sm); box-shadow: 0 8px 24px rgba(0,0,0,0.12); z-index: 100; overflow: hidden; display: none; -webkit-overflow-scrolling: touch; touch-action: manipulation; }
 .ac-list.open { display: block; }
-.ac-item { padding: 11px 14px; font-size: 14px; font-family: var(--font-body); color: var(--ink); cursor: pointer; border-bottom: 1px solid var(--surface); display: flex; align-items: center; justify-content: space-between; }
+.ac-item { padding: 11px 14px; font-size: 14px; font-family: var(--font-body); color: var(--ink); cursor: pointer; border-bottom: 1px solid var(--surface); display: flex; align-items: center; justify-content: space-between; touch-action: manipulation; -webkit-tap-highlight-color: rgba(0,184,148,0.2); }
 .ac-item:last-child { border-bottom: none; }
 .ac-item:hover, .ac-item.active { background: var(--teal-l); }
 .ac-item-stock { font-size: 11px; color: var(--muted); font-family: var(--font-head); }
@@ -594,35 +594,69 @@ function logUsage() {
 }
 
 // ── AUTOCOMPLETE ──────────────────────────────────────────────
-// FIX: mousedown+touchstart preventDefault on the LIST CONTAINER stops the
-// input blur firing before the tap resolves — the root cause of selections
-// being swallowed. Items use data-name + delegated click, no inline handlers.
+// Mobile fix: use a timed approach instead of preventDefault.
+// On mobile, blur fires before click — so we set a flag on touchstart
+// that delays the blur-close by enough time for the selection to complete.
+// touchend then fires the selection directly without waiting for click.
 let acIdx = -1;
+let _acTouching = false;
 
 (function() {
   var list = document.getElementById('ac-list');
+  var input = document.getElementById('drug-name');
 
-  list.addEventListener('mousedown',  function(e) { e.preventDefault(); });
-  list.addEventListener('touchstart', function(e) { e.preventDefault(); }, { passive: false });
+  // ── DESKTOP: mousedown prevents blur, click selects ──
+  list.addEventListener('mousedown', function(e) {
+    e.preventDefault(); // stops blur on desktop
+  });
 
+  // ── MOBILE: touchstart sets flag, touchend selects immediately ──
+  // We do NOT preventDefault on touchstart so the touch chain stays intact.
+  // Instead we set _acTouching=true so the input blur handler knows to wait.
+  list.addEventListener('touchstart', function(e) {
+    _acTouching = true;
+  }, { passive: true });
+
+  list.addEventListener('touchend', function(e) {
+    _acTouching = false;
+    var item = e.target.closest('.ac-item');
+    if (!item) return;
+    e.preventDefault(); // prevent the ghost click that follows touchend
+    acSelect(item);
+  });
+
+  // ── BOTH: delegated click for desktop (after mousedown preventDefault) ──
   list.addEventListener('click', function(e) {
     var item = e.target.closest('.ac-item');
     if (!item) return;
-    var name = item.getAttribute('data-name');
-    if (name === '__new__') {
-      document.getElementById('drug-stock').value  = '';
-      document.getElementById('drug-thresh').value = '';
-    } else {
-      document.getElementById('drug-name').value = name;
-      var d = drugs.find(function(x) { return x.name === name; });
-      if (d) {
-        document.getElementById('drug-stock').value  = d.stock;
-        document.getElementById('drug-thresh').value = d.threshold;
-      }
-    }
-    list.classList.remove('open');
+    acSelect(item);
+  });
+
+  // ── INPUT BLUR: close list unless a touch is in progress ──
+  input.addEventListener('blur', function() {
+    if (_acTouching) return; // mobile tap in progress — don't close yet
+    setTimeout(function() {
+      list.classList.remove('open');
+    }, 200);
   });
 })();
+
+function acSelect(item) {
+  var name = item.getAttribute('data-name');
+  var list = document.getElementById('ac-list');
+  if (name === '__new__') {
+    document.getElementById('drug-stock').value  = '';
+    document.getElementById('drug-thresh').value = '';
+  } else {
+    document.getElementById('drug-name').value = name;
+    var d = drugs.find(function(x) { return x.name === name; });
+    if (d) {
+      document.getElementById('drug-stock').value  = d.stock;
+      document.getElementById('drug-thresh').value = d.threshold;
+    }
+  }
+  list.classList.remove('open');
+}
 
 function acUpdate() {
   var raw  = document.getElementById('drug-name').value.trim();
@@ -673,6 +707,11 @@ function acKey(e) {
   }
 }
 
+// Close on outside tap/click (blur handler above covers most cases,
+// this catches edge cases like tapping elsewhere without focus change)
+document.addEventListener('touchend', function(e) {
+  if (!e.target.closest('.ac-wrap')) document.getElementById('ac-list').classList.remove('open');
+}, { passive: true });
 document.addEventListener('click', function(e) {
   if (!e.target.closest('.ac-wrap')) document.getElementById('ac-list').classList.remove('open');
 });
