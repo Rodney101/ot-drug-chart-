@@ -841,15 +841,15 @@ async function syncFromSheets() {
       const logsData = await logsRes.json();
       if (Array.isArray(logsData)) {
         // Map sheet log rows to the activity format the app uses
+        // Sheet returns newest-first. Reverse to oldest-first so render's
+        // slice(-8).reverse() correctly shows the 8 most recent entries.
         activity = logsData.map(row => {
           if (row.event === 'Drug Used') {
             return { kind:'usage', drug: row.drug, qty: row.qty, notes: row.notes, ts: row.ts };
           } else {
-            return { kind:'stock', drug: row.drug, stock: row.stock, threshold: row.threshold, verb: row.event || 'Updated', oldName: row.oldName, ts: row.ts };
+            return { kind:'stock', drug: row.drug, stock: row.stock, threshold: row.threshold, verb: row.event || 'Updated', oldName: row.oldName || '', ts: row.ts };
           }
-        });
-        // Store in reverse so newest is last (slice(-8).reverse() in render)
-        activity.reverse();
+        }).filter(a => a.drug || a.verb).reverse();
       }
     }
 

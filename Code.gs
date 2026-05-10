@@ -48,31 +48,45 @@ function doGet(e) {
 
     if (vals.length <= 1) return jsonResponse([]);
 
-    const headers   = vals[0].map(h => h.toString().toLowerCase().trim());
-    const tsIdx     = headers.indexOf("timestamp");
-    const eventIdx  = headers.indexOf("event type");
-    const drugIdx   = headers.indexOf("drug");
-    const qtyIdx    = headers.indexOf("qty used");
-    const notesIdx  = headers.indexOf("notes");
-    const stockIdx  = headers.indexOf("stock after");
-    const thrIdx    = headers.indexOf("threshold");
-    const oldIdx    = headers.indexOf("old name");
+    // Map headers flexibly — trim and lowercase, handle any spacing
+    const headers = vals[0].map(h => h.toString().toLowerCase().replace(/\s+/g, " ").trim());
 
-    // Return last 20 entries, most recent first
-    const rows = vals.slice(1)
-      .filter(r => r[tsIdx] || r[drugIdx])
-      .slice(-20)
-      .reverse()
-      .map(r => ({
-        ts:        r[tsIdx] ? new Date(r[tsIdx]).toISOString() : "",
-        event:     r[eventIdx]  ? r[eventIdx].toString()  : "",
-        drug:      r[drugIdx]   ? r[drugIdx].toString()   : "",
-        qty:       r[qtyIdx]    ? Number(r[qtyIdx])       : "",
-        notes:     r[notesIdx]  ? r[notesIdx].toString()  : "",
-        stock:     r[stockIdx] !== "" ? Number(r[stockIdx]) : "",
-        threshold: r[thrIdx]   !== "" ? Number(r[thrIdx])   : "",
-        oldName:   r[oldIdx]    ? r[oldIdx].toString()    : ""
-      }));
+    // Helper: find column index by multiple possible names
+    function col(names) {
+      for (var n of names) {
+        var i = headers.indexOf(n);
+        if (i !== -1) return i;
+      }
+      return -1;
+    }
+
+    const tsIdx    = col(["timestamp", "time", "date"]);
+    const eventIdx = col(["event type", "event", "type"]);
+    const drugIdx  = col(["drug", "drug name", "name"]);
+    const qtyIdx   = col(["qty used", "qty", "quantity", "quantity used"]);
+    const notesIdx = col(["notes", "note"]);
+    const stockIdx = col(["stock after", "stock", "remaining"]);
+    const thrIdx   = col(["threshold", "reorder at", "reorder"]);
+    const oldIdx   = col(["old name", "oldname", "previous name"]);
+
+    // Return last 30 entries most recent first, skip header row
+    const dataRows = vals.slice(1).filter(r => r.some(cell => cell !== ""));
+    const rows = dataRows.slice(-30).reverse().map(r => {
+      var ts = "";
+      if (tsIdx !== -1 && r[tsIdx]) {
+        try { ts = new Date(r[tsIdx]).toISOString(); } catch(e) { ts = r[tsIdx].toString(); }
+      }
+      return {
+        ts:        ts,
+        event:     eventIdx !== -1 ? (r[eventIdx] || "").toString() : "",
+        drug:      drugIdx  !== -1 ? (r[drugIdx]  || "").toString() : "",
+        qty:       qtyIdx   !== -1 && r[qtyIdx] !== "" ? Number(r[qtyIdx]) : "",
+        notes:     notesIdx !== -1 ? (r[notesIdx] || "").toString() : "",
+        stock:     stockIdx !== -1 && r[stockIdx] !== "" ? Number(r[stockIdx]) : "",
+        threshold: thrIdx   !== -1 && r[thrIdx]   !== "" ? Number(r[thrIdx])   : "",
+        oldName:   oldIdx   !== -1 ? (r[oldIdx]   || "").toString() : ""
+      };
+    }).filter(r => r.drug || r.event); // only rows with meaningful data
 
     return jsonResponse(rows);
   }
