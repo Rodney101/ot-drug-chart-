@@ -1,4 +1,4 @@
-const CACHE = 'ot-v4';
+const CACHE = 'ot-v5-202605100231';
 const ASSETS = [
   '/ot-drug-chart-/',
   '/ot-drug-chart-/index.html',
@@ -7,6 +7,7 @@ const ASSETS = [
   '/ot-drug-chart-/icons/icon-512.png'
 ];
 
+// Install — skip waiting immediately so new SW activates without delay
 self.addEventListener('install', e => {
   self.skipWaiting();
   e.waitUntil(
@@ -16,12 +17,21 @@ self.addEventListener('install', e => {
   );
 });
 
+// Activate — delete ALL old caches immediately, claim all clients
 self.addEventListener('activate', e => {
   e.waitUntil(
     caches.keys()
-      .then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k))))
+      .then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => {
+        console.log('Deleting old cache:', k);
+        return caches.delete(k);
+      })))
       .then(() => self.clients.claim())
   );
+});
+
+// Message handler — allow page to force skip waiting
+self.addEventListener('message', e => {
+  if (e.data && e.data.type === 'SKIP_WAITING') self.skipWaiting();
 });
 
 self.addEventListener('fetch', e => {
