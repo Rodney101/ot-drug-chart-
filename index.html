@@ -303,11 +303,7 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
   <!-- STOCK -->
   <div class="section" id="tab-stock">
     <div style="display:flex; gap:8px; margin-bottom:12px;">
-      <button class="btn btn-dark btn-sm" onclick="syncFromSheets()" style="flex:1;">
-        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>
-        Pull from Sheets
-      </button>
-      <button class="btn btn-ghost btn-sm" onclick="go('stock-add')" style="flex:1;" id="add-drug-btn">
+      <button class="btn btn-primary btn-sm" onclick="go('stock-add')" style="flex:1;" id="add-drug-btn">
         <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
         Add drug
       </button>
@@ -356,28 +352,12 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
       <div id="alert-list"><div class="empty"><svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>All stock levels healthy</div></div>
     </div>
     <div class="card">
-      <div class="card-hd">
-        <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/></svg>
-        Test notifications
-      </div>
-      <button class="btn btn-ghost" onclick="testPush()">Send test push notification</button>
-    </div>
+
   </div>
 
   <!-- SETTINGS -->
   <div class="section" id="tab-settings">
-    <div class="s-label">Google Sheets — bidirectional sync</div>
-    <div class="card">
-      <div class="fg">
-        <label>Apps Script Web App URL</label>
-        <div class="url-row">
-          <input type="url" id="cfg-url" placeholder="https://script.google.com/macros/s/.../exec"/>
-          <button class="btn btn-primary btn-sm" onclick="saveUrl()">Save</button>
-        </div>
-        <p style="font-size:11px;color:var(--muted);margin-top:6px;line-height:1.6;">Paste your deployment URL. The app will push usage logs to Sheets <em>and</em> pull current stock levels back.</p>
-      </div>
 
-    </div>
 
     <div class="s-label">Notifications</div>
     <div class="card">
@@ -392,11 +372,6 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
       </button>
     </div>
 
-    <div class="s-label">About</div>
-    <div class="card" style="display:flex;align-items:center;justify-content:space-between;">
-      <span style="font-family:var(--font-head);font-size:13px;font-weight:600;">OT Drug Chart</span>
-      <span class="badge b-blue">v2.0 PWA</span>
-    </div>
   </div>
 
 </div>
@@ -422,6 +397,7 @@ let drugs    = JSON.parse(localStorage.getItem('ot_drugs')    || '[]');
 let logs     = JSON.parse(localStorage.getItem('ot_logs')     || '[]');
 let activity = JSON.parse(localStorage.getItem('ot_activity') || '[]');
 let settings = JSON.parse(localStorage.getItem('ot_settings') || '{}');
+settings.sheetUrl = 'https://script.google.com/macros/s/AKfycbzu5GfPfoZx-SdTKHjn0GQz94mcV8pxOO58qE4YpX7oouYG3VFhOa30ZxzgpQ4lIxQd/exec';
 let qty      = 1;
 let lastSync = localStorage.getItem('ot_last_sync') || null;
 
@@ -453,7 +429,13 @@ function toast(msg) {
 // ── HELPERS ──────────────────────────────────────────────
 function status(d) { return d.stock===0?'out': d.stock<=d.threshold?'low':'ok'; }
 
-function showAddForm()  { document.getElementById('add-form').style.display='block'; document.getElementById('add-drug-btn').style.display='none'; }
+function showAddForm() {
+  document.getElementById('add-form').style.display = 'block';
+  document.getElementById('add-drug-btn').style.display = 'none';
+  ['drug-name','drug-stock','drug-thresh'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('ac-list').classList.remove('open');
+  setTimeout(() => document.getElementById('drug-name').focus(), 80);
+}
 function hideAddForm()  { document.getElementById('add-form').style.display='none';  document.getElementById('add-drug-btn').style.display=''; }
 
 // ── RENDER ──────────────────────────────────────────────
@@ -559,7 +541,6 @@ function render() {
   document.querySelector('#dash-sync-card .sc-btn').onclick = settings.sheetUrl ? syncFromSheets : ()=>go('settings');
 
   // Settings fields
-  if (settings.sheetUrl) document.getElementById('cfg-url').value = settings.sheetUrl;
   if (settings.alertEmail) document.getElementById('cfg-email').value = settings.alertEmail;
 }
 
@@ -909,11 +890,7 @@ function sendSummaryNow() {
     .finally(() => { btn.innerHTML = '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2L15 22l-4-9-9-4 20-7z"/></svg> Send summary now'; btn.disabled = false; });
 }
 
-function saveUrl() {
-  settings.sheetUrl = document.getElementById('cfg-url').value.trim();
-  persist(); render();
-  if (settings.sheetUrl) toast('Sheet URL saved ✓');
-}
+
 function saveEmail() {
   settings.alertEmail = document.getElementById('cfg-email').value.trim();
   persist();
