@@ -809,38 +809,60 @@ async function sendToSheets(data) {
 async function syncFromSheets() {
   if (!settings.sheetUrl) { toast('No Sheets URL — check Settings'); return; }
   const sd = document.getElementById('sync-dot');
-  sd.className='sync-dot spin';
-  document.getElementById('sync-status-txt').textContent='Syncing...';
+  sd.className = 'sync-dot spin';
+  document.getElementById('sync-status-txt').textContent = 'Syncing...';
   try {
-    // GET request — Apps Script doGet returns current stock as JSON
-    const res = await fetch(settings.sheetUrl + '?action=getStock', { method:'GET', mode:'cors' });
-    if (!res.ok) throw new Error('HTTP '+res.status);
-    const data = await res.json();
-    // data expected: [ { name, stock, threshold, max }, ... ]
-    if (Array.isArray(data) && data.length) {
-      // FULL REPLACE — Google Sheets is the source of truth.
-      // Discard all local drug data and use exactly what the sheet returns.
-      drugs = data
-        .filter(row => row.name)
-        .map(row => ({
-          name:      row.name,
-          stock:     parseInt(row.stock)     || 0,
-          threshold: parseInt(row.threshold) || 5
-        }));
-      persist();
-      lastSync = new Date().toISOString();
-      localStorage.setItem('ot_last_sync', lastSync);
-      render();
-      toast(`Synced — ${drugs.length} drug${drugs.length!==1?'s':''} loaded from Sheets ✓`);
-      drugs.forEach(d=>{ if(status(d)!=='ok' && settings.pushEnabled) push(`Low stock: ${d.name}`,`${d.stock} units remaining`); });
-    } else {
-      toast('No stock data received from Sheets');
+    // Fetch stock and logs in parallel
+    const [stockRes, logsRes] = await Promise.all([
+      fetch(settings.sheetUrl + '?action=getStock', { method:'GET', mode:'cors' }),
+      fetch(settings.sheetUrl + '?action=getLogs',  { method:'GET', mode:'cors' })
+    ]);
+
+    // ── STOCK: full replace from Sheets ──
+    if (stockRes.ok) {
+      const stockData = await stockRes.json();
+      if (Array.isArray(stockData) && stockData.length) {
+        drugs = stockData
+          .filter(row => row.name)
+          .map(row => ({
+            name:      row.name,
+            stock:     parseInt(row.stock)     || 0,
+            threshold: parseInt(row.threshold) || 5
+          }));
+        drugs.forEach(d => {
+          if (status(d) !== 'ok' && settings.pushEnabled)
+            push(`Low stock: ${d.name}`, `${d.stock} units remaining`);
+        });
+      }
     }
-    sd.className='sync-dot ok';
+
+    // ── LOGS: full replace from Sheets ──
+    if (logsRes.ok) {
+      const logsData = await logsRes.json();
+      if (Array.isArray(logsData)) {
+        // Map sheet log rows to the activity format the app uses
+        activity = logsData.map(row => {
+          if (row.event === 'Drug Used') {
+            return { kind:'usage', drug: row.drug, qty: row.qty, notes: row.notes, ts: row.ts };
+          } else {
+            return { kind:'stock', drug: row.drug, stock: row.stock, threshold: row.threshold, verb: row.event || 'Updated', oldName: row.oldName, ts: row.ts };
+          }
+        });
+        // Store in reverse so newest is last (slice(-8).reverse() in render)
+        activity.reverse();
+      }
+    }
+
+    persist();
+    lastSync = new Date().toISOString();
+    localStorage.setItem('ot_last_sync', lastSync);
+    render();
+    toast(`Synced — ${drugs.length} drug${drugs.length!==1?'s':''} · ${activity.length} log${activity.length!==1?'s':''} loaded ✓`);
+    sd.className = 'sync-dot ok';
   } catch(err) {
-    sd.className='sync-dot err';
-    document.getElementById('sync-status-txt').textContent='Sync failed — check URL';
-    toast('Sync failed: '+err.message);
+    sd.className = 'sync-dot err';
+    document.getElementById('sync-status-txt').textContent = 'Sync failed — check URL';
+    toast('Sync failed: ' + err.message);
     console.error(err);
   }
 }

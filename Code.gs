@@ -41,6 +41,42 @@ function doGet(e) {
     return jsonResponse(rows);
   }
 
+  if (action === "getLogs") {
+    const ss    = SpreadsheetApp.getActiveSpreadsheet();
+    const sheet = ss.getSheetByName(SHEET_NAME_LOGS);
+    const vals  = sheet.getDataRange().getValues();
+
+    if (vals.length <= 1) return jsonResponse([]);
+
+    const headers   = vals[0].map(h => h.toString().toLowerCase().trim());
+    const tsIdx     = headers.indexOf("timestamp");
+    const eventIdx  = headers.indexOf("event type");
+    const drugIdx   = headers.indexOf("drug");
+    const qtyIdx    = headers.indexOf("qty used");
+    const notesIdx  = headers.indexOf("notes");
+    const stockIdx  = headers.indexOf("stock after");
+    const thrIdx    = headers.indexOf("threshold");
+    const oldIdx    = headers.indexOf("old name");
+
+    // Return last 20 entries, most recent first
+    const rows = vals.slice(1)
+      .filter(r => r[tsIdx] || r[drugIdx])
+      .slice(-20)
+      .reverse()
+      .map(r => ({
+        ts:        r[tsIdx] ? new Date(r[tsIdx]).toISOString() : "",
+        event:     r[eventIdx]  ? r[eventIdx].toString()  : "",
+        drug:      r[drugIdx]   ? r[drugIdx].toString()   : "",
+        qty:       r[qtyIdx]    ? Number(r[qtyIdx])       : "",
+        notes:     r[notesIdx]  ? r[notesIdx].toString()  : "",
+        stock:     r[stockIdx] !== "" ? Number(r[stockIdx]) : "",
+        threshold: r[thrIdx]   !== "" ? Number(r[thrIdx])   : "",
+        oldName:   r[oldIdx]    ? r[oldIdx].toString()    : ""
+      }));
+
+    return jsonResponse(rows);
+  }
+
   return jsonResponse({ status: "ok", message: "OT Drug Chart API running" });
 }
 
