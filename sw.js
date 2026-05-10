@@ -1,4 +1,4 @@
-const CACHE = 'ot-v3';
+const CACHE = 'ot-v4';
 const ASSETS = [
   '/ot-drug-chart-/',
   '/ot-drug-chart-/index.html',
