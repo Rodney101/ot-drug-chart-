@@ -15,7 +15,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
-<title>OT Drug Chart</title>
+<title>OT Drug Chart v9</title>
 <style>
 :root {
   --ink:       #0d0d1a;
@@ -910,7 +910,7 @@ function saveEmail() {
   document.getElementById('hdr-date').textContent =
     _days[_now.getDay()] + ' ' + _months[_now.getMonth()] + ' ' + _now.getDate() + ', ' + _now.getFullYear();
 })();
-render();
+try { render(); } catch(e) { console.error('RENDER ERROR:', e); document.querySelector('.content').innerHTML = '<div style="padding:20px;color:red;"><b>Render error:</b> '+e.message+'</div>'; }
 
 // Auto-sync from Google Sheets on every page load/refresh
 // This keeps localStorage up to date with the sheet as the source of truth
