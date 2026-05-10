@@ -905,24 +905,9 @@ function saveEmail() {
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/ot-drug-chart-/sw.js', { scope: '/ot-drug-chart-/' })
     .then(reg => {
-      console.log('SW registered:', reg.scope);
-      // Force check for updates every time page loads
-      reg.update();
-      // When a new SW is waiting, activate it immediately
-      if (reg.waiting) reg.waiting.postMessage({ type: 'SKIP_WAITING' });
-      reg.addEventListener('updatefound', () => {
-        const newSW = reg.installing;
-        newSW.addEventListener('statechange', () => {
-          if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
-            // New version ready — reload to activate
-            window.location.reload();
-          }
-        });
-      });
+      reg.update(); // check for new version silently
     })
     .catch(e => console.warn('SW failed:', e));
-  // When SW controller changes (new SW activated), reload
-  navigator.serviceWorker.addEventListener('controllerchange', () => window.location.reload());
 }
 
 // ── INIT ──────────────────────────────────────
