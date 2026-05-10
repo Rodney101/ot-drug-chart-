@@ -183,6 +183,19 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
 /* PULL TO SYNC hint */
 .pull-hint { text-align: center; font-size: 11px; color: var(--muted); padding: 8px 0 0; font-family: var(--font-head); display: flex; align-items: center; justify-content: center; gap: 5px; }
 .pull-hint svg { width: 13px; height: 13px; stroke: var(--muted); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.help-section { margin-bottom: 18px; padding-bottom: 18px; border-bottom: 1.5px solid var(--surface); }
+.help-section:last-child { border-bottom: none; margin-bottom: 0; }
+.help-h1 { font-family: var(--font-head); font-size: 14px; font-weight: 700; color: var(--teal-d); margin: 0 0 8px; padding-bottom: 5px; border-bottom: 2px solid var(--teal-l); }
+.help-h2 { font-family: var(--font-head); font-size: 11px; font-weight: 700; color: var(--ink); margin: 10px 0 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+.help-body { font-size: 13px; color: var(--ink); line-height: 1.6; margin: 0 0 6px; }
+.help-note { font-size: 12px; color: var(--teal-d); font-style: italic; background: var(--teal-l); border-left: 3px solid var(--teal); padding: 7px 10px; border-radius: 0 var(--r-sm) var(--r-sm) 0; margin: 8px 0; line-height: 1.5; }
+.help-list { font-size: 13px; color: var(--ink); line-height: 1.7; margin: 0 0 6px; padding-left: 18px; }
+.help-list li { margin-bottom: 2px; }
+.help-table { width: 100%; border-collapse: collapse; font-size: 12px; margin: 6px 0 8px; }
+.help-table th { background: var(--teal-d); color: white; font-family: var(--font-head); font-weight: 700; padding: 6px 10px; text-align: left; font-size: 11px; }
+.help-table td { padding: 6px 10px; border-bottom: 1px solid var(--border); color: var(--ink); vertical-align: top; }
+.help-table tr:last-child td { border-bottom: none; }
+.help-table tr:nth-child(even) td { background: var(--surface); }
 /* AUTOCOMPLETE */
 .ac-wrap { position: relative; }
 .ac-list { position: absolute; top: calc(100% + 4px); left: 0; right: 0; background: var(--white); border: 1.5px solid var(--teal); border-radius: var(--r-sm); box-shadow: 0 8px 24px rgba(0,0,0,0.12); z-index: 100; overflow: hidden; display: none; -webkit-overflow-scrolling: touch; touch-action: manipulation; }
@@ -235,6 +248,10 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
     <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
     ALERTS
     <span class="t-dot" id="t-dot"></span>
+  </button>
+  <button class="tab" onclick="go('help')">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    HELP
   </button>
 
 </div>
@@ -359,6 +376,128 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
 
 </div>
 
+  <!-- HELP -->
+  <div class="section" id="tab-help">
+    <div class="card">
+      <div class="card-hd">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        OT Drug Chart — User Guide
+      </div>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:16px;">OT Department · Drug Management System</p>
+
+      <div class="help-section">
+        <div class="help-h1">Overview</div>
+        <p class="help-body">The OT Drug Chart is a web-based application used by the OT department to manage drug stock levels and log usage. It connects to Google Sheets in real time so all staff see the same up-to-date information across any device.</p>
+        <div class="help-h2">Accessing the app</div>
+        <p class="help-body">Open the app in any browser using the link provided. On Android phones it can be installed as a home screen app for quick access.</p>
+        <div class="help-h2">App tabs</div>
+        <table class="help-table"><tr><th>Tab</th><th>What it does</th></tr>
+          <tr><td>DASH</td><td>Overview — metrics, recent activity, sync status</td></tr>
+          <tr><td>LOG USE</td><td>Record when a drug is administered</td></tr>
+          <tr><td>STOCK</td><td>View, add, edit, and remove drugs from the chart</td></tr>
+          <tr><td>ALERTS</td><td>See all drugs that are low or out of stock</td></tr>
+        </table>
+      </div>
+
+      <div class="help-section">
+        <div class="help-h1">DASH — Dashboard</div>
+        <p class="help-body">Gives a quick overview of the current state of the drug chart.</p>
+        <div class="help-h2">Metrics</div>
+        <ul class="help-list">
+          <li><b>Drugs tracked</b> — total number of drugs on the chart</li>
+          <li><b>Low stock</b> — drugs at or below their reorder threshold</li>
+          <li><b>Critical / out</b> — drugs with zero stock remaining</li>
+        </ul>
+        <div class="help-h2">Recent activity</div>
+        <p class="help-body">Shows the last 8 actions — drug usage logs, stock additions, updates, renames, and removals. Pulled from Google Sheets on every sync so it reflects activity from all staff on all devices.</p>
+        <div class="help-h2">Sync status bar</div>
+        <p class="help-body">The bar below the header shows the connection status and last sync time. Tap "Sync now ↺" to manually refresh.</p>
+        <div class="help-note">The app syncs automatically on every page load and every 5 minutes.</div>
+      </div>
+
+      <div class="help-section">
+        <div class="help-h1">LOG USE — Recording Drug Usage</div>
+        <p class="help-body">Use this tab every time a drug is administered.</p>
+        <div class="help-h2">Steps</div>
+        <ol class="help-list">
+          <li>Tap the <b>LOG USE</b> tab.</li>
+          <li>Select the drug from the dropdown.</li>
+          <li>Use − and + to set the quantity.</li>
+          <li>Add a note if needed — optional.</li>
+          <li>Tap <b>Log usage</b>.</li>
+        </ol>
+        <div class="help-note">Stock decreases immediately. If it drops to or below the reorder threshold, an alert fires and an email is sent automatically.</div>
+      </div>
+
+      <div class="help-section">
+        <div class="help-h1">STOCK — Managing Drug Stock</div>
+        <div class="help-h2">Stock status</div>
+        <table class="help-table"><tr><th>Badge</th><th>Colour</th><th>Meaning</th></tr>
+          <tr><td><b style="color:#15803d;">OK</b></td><td>Green</td><td>Above reorder threshold</td></tr>
+          <tr><td><b style="color:#92400e;">LOW</b></td><td>Amber</td><td>At or below reorder threshold</td></tr>
+          <tr><td><b style="color:#991b1b;">OUT</b></td><td>Red</td><td>Zero stock remaining</td></tr>
+        </table>
+        <div class="help-h2">Adding a drug</div>
+        <ol class="help-list">
+          <li>Tap <b>Add drug</b>.</li>
+          <li>Type the name — tap a suggestion if it appears.</li>
+          <li>Enter current stock and reorder threshold.</li>
+          <li>Tap <b>Save drug</b>.</li>
+        </ol>
+        <div class="help-h2">Editing a drug name</div>
+        <p class="help-body">Tap the blue pencil icon → edit in popup → tap Save. Updates both app and Google Sheets.</p>
+        <div class="help-h2">Removing a drug</div>
+        <p class="help-body">Tap ✕ → confirm. Removes from app and Google Sheets. A "Drug Removed" entry is added to the Logs tab.</p>
+        <div class="help-note">You can also delete a drug directly from the Stock tab in Google Sheets — the next sync removes it from the app automatically.</div>
+      </div>
+
+      <div class="help-section">
+        <div class="help-h1">ALERTS — Stock Alerts</div>
+        <p class="help-body">Lists every drug that is low or out of stock. The alert count shows on the tab badge.</p>
+        <ul class="help-list">
+          <li><b>LOW</b> — stock is at or below the reorder threshold</li>
+          <li><b>OUT</b> — stock is zero, reorder immediately</li>
+        </ul>
+        <div class="help-note">Check the Alerts tab before ending your shift.</div>
+      </div>
+
+      <div class="help-section">
+        <div class="help-h1">Google Sheets Integration</div>
+        <p class="help-body">The app connects to a Google Sheet as its central database. All changes are written automatically. Stock levels pull back on every page load and every 5 minutes.</p>
+        <ul class="help-list">
+          <li><b>Logs tab</b> — full audit trail of every action</li>
+          <li><b>Stock tab</b> — current drug list. This is the source of truth</li>
+        </ul>
+        <p class="help-body">Changes on one device appear on other devices after their next sync. Worst-case lag is 5 minutes.</p>
+      </div>
+
+      <div class="help-section">
+        <div class="help-h1">Quick Reference</div>
+        <table class="help-table"><tr><th>Task</th><th>How</th></tr>
+          <tr><td>Log drug usage</td><td>LOG USE → select drug → qty → Log usage</td></tr>
+          <tr><td>Add a drug</td><td>STOCK → Add drug → fill fields → Save</td></tr>
+          <tr><td>Edit drug name</td><td>STOCK → pencil icon → edit → Save</td></tr>
+          <tr><td>Remove a drug</td><td>STOCK → ✕ → confirm</td></tr>
+          <tr><td>Check alerts</td><td>ALERTS tab</td></tr>
+          <tr><td>Sync from Sheets</td><td>Tap "Sync now ↺" in top bar</td></tr>
+          <tr><td>Recent activity</td><td>DASH → Recent activity section</td></tr>
+        </table>
+      </div>
+
+      <div class="help-section" style="border:none;">
+        <div class="help-h1">Important Notes</div>
+        <ul class="help-list">
+          <li>Log drug usage immediately — do not batch log at end of shift.</li>
+          <li>If "Sync failed" shows, you may be offline. Logs save locally and sync when connection restores.</li>
+          <li>Tap "Sync now" for the most current stock counts across devices.</li>
+          <li>Drugs deleted from Google Sheets are removed from the app on the next sync.</li>
+        </ul>
+      </div>
+
+      <p style="font-size:11px;color:var(--muted);text-align:center;font-style:italic;">OT Drug Chart — Confidential Internal Document</p>
+    </div>
+  </div>
+
 <!-- EDIT DRUG NAME MODAL -->
 <!-- backdrop closes modal when tapped -->
 <div id="edit-backdrop" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:500;" onclick="closeEditModal()"></div>
@@ -392,7 +531,7 @@ function persist() {
 }
 
 // ── TABS ──────────────────────────────────────────────
-const TABS = ['dashboard','log','stock','alerts'];
+const TABS = ['dashboard','log','stock','alerts','help'];
 function go(t) {
   if (t === 'stock-add') { go('stock'); showAddForm(); return; }
   TABS.forEach(id => document.getElementById('tab-'+id).classList.remove('active'));
