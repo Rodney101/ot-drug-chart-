@@ -818,23 +818,20 @@ async function syncFromSheets() {
     const data = await res.json();
     // data expected: [ { name, stock, threshold, max }, ... ]
     if (Array.isArray(data) && data.length) {
-      data.forEach(row => {
-        if (!row.name) return;
-        const idx = drugs.findIndex(d=>d.name.toLowerCase()===row.name.toLowerCase());
-        const updated = {
-          name: row.name,
-          stock: parseInt(row.stock)||0,
-          threshold: parseInt(row.threshold)||5
-        };
-        if (idx>=0) drugs[idx]=updated;
-        else drugs.push(updated);
-      });
+      // FULL REPLACE — Google Sheets is the source of truth.
+      // Discard all local drug data and use exactly what the sheet returns.
+      drugs = data
+        .filter(row => row.name)
+        .map(row => ({
+          name:      row.name,
+          stock:     parseInt(row.stock)     || 0,
+          threshold: parseInt(row.threshold) || 5
+        }));
       persist();
       lastSync = new Date().toISOString();
       localStorage.setItem('ot_last_sync', lastSync);
       render();
-      toast(`Stock synced — ${data.length} drug${data.length!==1?'s':''} updated ✓`);
-      // Check for new alerts after sync
+      toast(`Synced — ${drugs.length} drug${drugs.length!==1?'s':''} loaded from Sheets ✓`);
       drugs.forEach(d=>{ if(status(d)!=='ok' && settings.pushEnabled) push(`Low stock: ${d.name}`,`${d.stock} units remaining`); });
     } else {
       toast('No stock data received from Sheets');
